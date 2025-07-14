@@ -2,8 +2,31 @@
 @import "tailwindcss";
 @import "./custom.css";
 
+@theme {
+  --color-bgdark: 0, 0, 0;
+  --color-bgn: 0, 0, 5;
+  --color-bgdark: 0, 0, 10;
+  --color-text: 0, 0, 95;
+  --color-textmuted: 0, 0, 70;
+  --color-primary: 73, 100, 50;
+  --color-primarysoft: 73, 100, 75;
+
+  --text-h1: 40px;
+  --text-h1--letter-spacing: -0.05em;
+  --text-h2: 32px;
+  --text-h2--letter-spacing: -0.05em;
+  --text-p1: 20px;
+  --text-h2--letter-spacing: 0em;
+  --text-p2: 16px;
+  --text-h2--letter-spacing: 0em;
+
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+}
+
 :root {
   font-family: "Roboto Mono", monospace;
+  line-height: 1.2rem;
 }
 
 .dither-container {

@@ -11,9 +11,9 @@
     --color-primarysoft: 227 255 128; /* #E3FF80 */
   }
 
-  * {
+  /* * {
     line-height: 1.2rem;
-  }
+  } */
 }
 
 /* Utility classes for custom colors */
