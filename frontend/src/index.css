@@ -1,0 +1,13 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap");
+@import "tailwindcss";
+@import "./custom.css";
+
+:root {
+  font-family: "Roboto Mono", monospace;
+}
+
+.dither-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}

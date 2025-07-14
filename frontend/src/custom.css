@@ -1,0 +1,111 @@
+/* Custom CSS variables for Tailwind v4 */
+@layer base {
+  :root {
+    /* Custom colors */
+    --color-bgdark: 0 0 0; /* #000000 */
+    --color-bg: 13 13 13; /* #0D0D0D */
+    --color-bglight: 26 26 26; /* #1A1A1A */
+    --color-text: 242 242 242; /* #F2F2F2 */
+    --color-textmuted: 178 178 178; /* #B2B2B2 */
+    --color-primary: 200 255 0; /* #C8FF00 */
+    --color-primarysoft: 227 255 128; /* #E3FF80 */
+  }
+
+  * {
+    line-height: 1.2rem;
+  }
+}
+
+/* Utility classes for custom colors */
+.bg-dark {
+  background-color: rgb(var(--color-bgdark));
+}
+.bg-dark-75 {
+  background-color: rgb(var(--color-bgdark));
+  opacity: 0.75;
+}
+.bg-bg {
+  background-color: rgb(var(--color-bg));
+}
+.bg-light {
+  background-color: rgb(var(--color-bglight));
+}
+.bg-primary {
+  background-color: rgb(var(--color-primary));
+}
+.bg-primarysoft {
+  background-color: rgb(var(--color-primarysoft));
+}
+.bg-text {
+  background-color: rgb(var(--color-text));
+}
+.bg-text-muted {
+  background-color: rgb(var(--color-textmuted));
+}
+
+.text-text {
+  color: rgb(var(--color-text));
+}
+.text-muted {
+  color: rgb(var(--color-textmuted));
+}
+.text-primary {
+  color: rgb(var(--color-primary));
+}
+.text-primarysoft {
+  color: rgb(var(--color-primarysoft));
+}
+.text-bg-dark {
+  color: rgb(var(--color-bgdark));
+}
+
+/* Custom font sizes */
+.text-base {
+  font-size: 20px;
+  letter-spacing: 0em;
+  line-height: 1.2;
+}
+.text-h1 {
+  font-size: 40px;
+  letter-spacing: -0.05em;
+  line-height: 1.2;
+}
+.text-h2 {
+  font-size: 32px;
+  letter-spacing: 0em;
+  line-height: 1.2;
+}
+.text-card {
+  font-size: 16px;
+  letter-spacing: 0em;
+  line-height: 1.2;
+}
+
+/* Custom font weights */
+.font-regular {
+  font-weight: 400;
+}
+.font-semibold {
+  font-weight: 600;
+}
+
+/* Hover states for custom colors */
+.hover\:bg-text-muted:hover {
+  background-color: rgb(var(--color-textmuted));
+}
+.hover\:bg-light:hover {
+  background-color: rgb(var(--color-bglight));
+}
+.hover\:bg-bg:hover {
+  background-color: rgb(var(--color-bg));
+}
+.hover\:bg-primary:hover {
+  background-color: rgb(var(--color-primary));
+}
+.hover\:bg-primarysoft:hover {
+  background-color: rgb(var(--color-primarysoft));
+}
+
+.hover\:text-bg-dark:hover {
+  color: rgb(var(--color-bgdark));
+}
