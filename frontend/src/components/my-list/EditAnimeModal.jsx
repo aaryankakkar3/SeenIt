@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { useAnimeBackendStore } from "../../store/anime.backend.store";
+import { useAnimeExternalStore } from "../../store/anime.external.store";
 import { toast } from "react-hot-toast";
 
 export default function EditAnimeModal({
@@ -14,6 +15,7 @@ export default function EditAnimeModal({
   const [rating, setRating] = useState(0);
   const [watchedEp, setWatchedEp] = useState("");
   const { createAnime, editAnime, deleteAnime } = useAnimeBackendStore();
+  const { clearQueryResults } = useAnimeExternalStore();
 
   const statusOptions = ["Planned", "Active", "Completed", "Dropped"];
 
@@ -31,11 +33,12 @@ export default function EditAnimeModal({
       setWatchedEp(editingEntry.episodesWatched?.toString() || "");
       setRating(editingEntry.rating?.toString() || "0");
     } else {
+      // Reset form for new anime
       setSelectedStatus("Planned");
       setWatchedEp("");
       setRating("0");
     }
-  }, [isEditing, editingEntry]);
+  }, [isEditing, editingEntry, isOpen, selectedQueryResult]);
 
   // Frontend validation
   const validateInput = () => {
@@ -118,7 +121,7 @@ export default function EditAnimeModal({
             {isEditing ? "Edit Anime" : "Add New Anime"}
           </div>
           <X
-            className="text-textmuted w-[20px] h-[20px] cursor-pointer"
+            className="text-textmuted w-[20px] h-[20px] cursor-pointer hover:text-text"
             onClick={onCloseAll}
           />
         </div>
@@ -155,7 +158,7 @@ export default function EditAnimeModal({
                       <button
                         key={status}
                         onClick={() => handleStatusChange(status)}
-                        className={`bg-light w-full h-[40px] px-[12px] flex items-center cursor-pointer hover:bg-light transition-colors ${
+                        className={`bg-light w-full h-[40px] px-[12px] flex items-center cursor-pointer hover:border-white transition-colors ${
                           selectedStatus === status
                             ? "border-2 border-text"
                             : "border-2 border-transparent"
@@ -234,6 +237,8 @@ export default function EditAnimeModal({
                     } else {
                       await createAnime(animeData);
                       toast.success("Anime added successfully!");
+                      // Clear search results and reset form when adding new anime
+                      clearQueryResults();
                     }
 
                     onCloseAll();
@@ -242,7 +247,7 @@ export default function EditAnimeModal({
                     toast.error("Failed to save anime. Please try again.");
                   }
                 }}
-                className="bg-primary w-full h-[40px] text-dark font-semibold flex justify-center items-center cursor-pointer"
+                className="bg-primary w-full h-[40px] text-dark hover:opacity-90 font-semibold flex justify-center items-center cursor-pointer"
               >
                 {isEditing ? "Update Anime" : "Add Anime"}
               </button>
@@ -267,7 +272,7 @@ export default function EditAnimeModal({
                       }
                     }
                   }}
-                  className="bg-red-500 w-full h-[40px] text-white font-semibold flex justify-center items-center cursor-pointer hover:bg-red-600"
+                  className="bg-red-600 w-full h-[40px] text-white font-semibold flex justify-center items-center cursor-pointer hover:opacity-90"
                 >
                   Delete Anime
                 </button>
@@ -275,7 +280,7 @@ export default function EditAnimeModal({
 
               <button
                 onClick={onClose}
-                className="bg-light w-full h-[40px] text-text flex justify-center items-center cursor-pointer"
+                className="bg-light w-full hover:border h-[40px] text-text flex justify-center items-center cursor-pointer"
               >
                 Go Back
               </button>

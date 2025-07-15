@@ -32,7 +32,7 @@ export default function SearchModal({ isOpen, onClose, onSelectResult }) {
         <div className="flex flex-row items-center justify-between">
           <div className="text-h2 text-text">Add New Anime</div>
           <X
-            className="text-textmuted w-[20px] h-[20px] cursor-pointer"
+            className="text-textmuted w-[20px] h-[20px] cursor-pointer hover:text-text"
             onClick={onClose}
           />
         </div>
@@ -53,7 +53,7 @@ export default function SearchModal({ isOpen, onClose, onSelectResult }) {
           </div>
           <button
             onClick={() => getQueryResults(searchQuery)}
-            className="h-[32px] w-[78px] text-dark bg-primary flex justify-center items-center font-semibold cursor-pointer"
+            className="h-[32px] w-[78px] text-dark bg-primary hover:opacity-90 flex justify-center items-center font-semibold cursor-pointer"
           >
             Search
           </button>
@@ -76,4 +76,3 @@ export default function SearchModal({ isOpen, onClose, onSelectResult }) {
     </div>
   );
 }
-
