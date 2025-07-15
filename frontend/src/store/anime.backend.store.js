@@ -109,9 +109,17 @@ export const useAnimeBackendStore = create((set) => ({
       console.error("Error decrementing episodes:", error);
     }
   },
+
+  deleteAnime: async (animeId) => {
+    try {
+      await axiosInstance.delete(`/anime/${animeId}`);
+      set((state) => ({
+        entries: state.entries.filter((entry) => entry._id !== animeId),
+      }));
+      toast.success("Anime entry deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete anime entry");
+      console.error("Error deleting anime entry:", error);
+    }
+  },
 }));
-
-
-
-
-
