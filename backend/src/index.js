@@ -4,6 +4,7 @@ import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import animeRoutes from "./routes/anime.route.js";
+import authRoutes from "./routes/auth.route.js";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use(
 );
 
 app.use("/api/anime", animeRoutes);
+app.use("/api/auth", authRoutes);
 
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
