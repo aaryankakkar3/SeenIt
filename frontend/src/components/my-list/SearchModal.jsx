@@ -23,16 +23,16 @@ export default function SearchModal({ isOpen, onClose, onSelectResult }) {
     <div className="fixed inset-0 z-10 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-dark-75 transition-opacity"
+        className="fixed inset-0 bg-dark opacity-75 transition-opacity"
         onClick={onClose}
       />
 
       {/* SearchModal Content */}
-      <div className="relative z-20 w-[528px] h-[582px] bg-bg flex flex-col p-[64px] gap-[12px]">
+      <div className="relative z-20 w-[528px] h-[582px] bg-medium flex flex-col p-[64px] gap-[12px]">
         <div className="flex flex-row items-center justify-between">
           <div className="text-h2 text-text">Add New Anime</div>
           <X
-            className="text-muted w-[20px] h-[20px] cursor-pointer"
+            className="text-textmuted w-[20px] h-[20px] cursor-pointer"
             onClick={onClose}
           />
         </div>
@@ -48,19 +48,19 @@ export default function SearchModal({ isOpen, onClose, onSelectResult }) {
                 e.key === "Enter" && getQueryResults(searchQuery)
               }
               placeholder="Search for anime"
-              className="w-[100%] h-[100%] placeholder:text-muted focus:outline-none"
+              className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
             />
           </div>
           <button
             onClick={() => getQueryResults(searchQuery)}
-            className="h-[32px] w-[78px] text-bg-dark bg-primary flex justify-center items-center font-semibold cursor-pointer"
+            className="h-[32px] w-[78px] text-dark bg-primary flex justify-center items-center font-semibold cursor-pointer"
           >
             Search
           </button>
         </div>
         <div className="h-[360px] w-[400px] bg-light flex flex-col overflow-y-auto">
           {filteredResults.length === 0 && queryResults.length > 0 && (
-            <div className="text-muted p-4 text-center">
+            <div className="text-textmuted p-4 text-center">
               All search results are already in your list
             </div>
           )}
@@ -76,3 +76,4 @@ export default function SearchModal({ isOpen, onClose, onSelectResult }) {
     </div>
   );
 }
+

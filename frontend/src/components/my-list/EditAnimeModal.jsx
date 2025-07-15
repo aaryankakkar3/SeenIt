@@ -112,20 +112,20 @@ export default function EditAnimeModal({
       <div className="fixed inset-0 transition-opacity" onClick={onCloseAll} />
 
       {/* EditAnimeModal Content */}
-      <div className="relative z-60 w-[884px] h-[580px] bg-bg flex flex-col p-[64px] gap-[32px]">
+      <div className="relative z-60 w-[884px] h-[580px] bg-medium flex flex-col p-[64px] gap-[32px]">
         <div className="flex flex-row justify-between">
           <div className="text-h2 text-text">
             {isEditing ? "Edit Anime" : "Add New Anime"}
           </div>
           <X
-            className="text-muted w-[20px] h-[20px] cursor-pointer"
+            className="text-textmuted w-[20px] h-[20px] cursor-pointer"
             onClick={onCloseAll}
           />
         </div>
         <div className="flex flex-row h-[381px] w-[756px] gap-[32px]">
           <img src={imageUrl} className="h-[381px] w-[267px]" />
           <div className="flex flex-col h-[381px] w-[457px] gap-[32px]">
-            <div className="flex flex-col gap-[16px] text-muted text-card">
+            <div className="flex flex-col gap-[16px] text-textmuted text-p2">
               <div className="flex flex-col gap-[6px]">
                 <div className="font-semibold">Name</div>
                 <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
@@ -187,7 +187,7 @@ export default function EditAnimeModal({
                       min="0"
                       max={episodesTotal || undefined}
                       placeholder={`0 - ${episodesTotal || "?"}`}
-                      className="w-[100%] h-[100%] placeholder:text-muted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
                 </div>
@@ -204,7 +204,7 @@ export default function EditAnimeModal({
                       max="5"
                       step="0.1"
                       placeholder="0 - 5"
-                      className="w-[100%] h-[100%] placeholder:text-muted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
                 </div>
@@ -242,7 +242,7 @@ export default function EditAnimeModal({
                     toast.error("Failed to save anime. Please try again.");
                   }
                 }}
-                className="bg-primary w-full h-[40px] text-bg-dark font-semibold flex justify-center items-center cursor-pointer"
+                className="bg-primary w-full h-[40px] text-dark font-semibold flex justify-center items-center cursor-pointer"
               >
                 {isEditing ? "Update Anime" : "Add Anime"}
               </button>

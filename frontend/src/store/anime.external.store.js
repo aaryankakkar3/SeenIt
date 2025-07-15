@@ -37,3 +37,8 @@ export const useAnimeExternalStore = create((set) => ({
     set({ queryResults: [] });
   },
 }));
+
+
+
+
+

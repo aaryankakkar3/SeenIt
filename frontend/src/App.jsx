@@ -1,6 +1,5 @@
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import Navbar from "./components/Navbar";
 import SignIn from "./pages/SignIn";
 import MyList from "./pages/MyList";
 import AI from "./pages/AI";
@@ -47,3 +46,4 @@ function App() {
 }
 
 export default App;
+

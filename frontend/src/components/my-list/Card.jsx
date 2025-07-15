@@ -28,12 +28,12 @@ export default function Card({ entry, onEdit }) {
 
   // Determine background and text styles based on yourStatus
   let statusBg = "#80FFDC";
-  let statusText = "text-bg-dark";
+  let statusText = "text-dark";
   let statusBorder = "";
 
   if (yourStatus === "Active") {
     statusBg = "#00FFB7";
-    statusText = "text-bg-dark";
+    statusText = "text-dark";
     statusBorder = "";
   } else if (yourStatus === "Planned") {
     statusBg = "#3700FF";
@@ -45,7 +45,7 @@ export default function Card({ entry, onEdit }) {
     statusBorder = "";
   } else if (yourStatus === "Dropped") {
     statusBg = "#fff";
-    statusText = "text-bg-dark";
+    statusText = "text-dark";
     statusBorder = "border border-white";
   }
 
@@ -54,10 +54,10 @@ export default function Card({ entry, onEdit }) {
       <img src={imageUrl} className="w-[90px] h-[129px]" />
       <div className="w-[264px] h-[128px] flex flex-col gap-[8px]">
         <div className="flex flex-col gap-[4px]">
-          <div className="text-base text-text font-semibold truncate">
+          <div className="text-p1 text-text font-semibold truncate">
             {title}
           </div>
-          <div className="text-muted text-card flex flex-row gap-[12px]">
+          <div className="text-textmuted text-p2 flex flex-row gap-[12px]">
             <div className="">{year}</div>
             <div className="">{animeStatus}</div>
           </div>
@@ -80,22 +80,22 @@ export default function Card({ entry, onEdit }) {
             <div className="flex flex-row gap-[4px]">
               <button
                 onClick={() => incrementEpisodes(_id)}
-                className="text-muted border border-gray-500 w-[24px] h-[24px] flex justify-center items-center cursor-pointer hover:bg-text-muted hover:text-bg"
+                className="text-textmuted border border-gray-500 w-[24px] h-[24px] flex justify-center items-center cursor-pointer hover:bg-textmuted hover:text-medium"
               >
                 <Plus size={16} />
               </button>
               <button
                 onClick={() => decrementEpisodes(_id)}
-                className="text-muted border border-gray-500 w-[24px] h-[24px] flex justify-center items-center cursor-pointer hover:bg-text-muted hover:text-bg"
+                className="text-textmuted border border-gray-500 w-[24px] h-[24px] flex justify-center items-center cursor-pointer hover:bg-textmuted hover:text-medium"
               >
-                <Minus className="text-muted" size={16} />
+                <Minus size={16} />
               </button>
             </div>
           </div>
           <div className="flex flex-rwo justify-between">
             <button
               onClick={() => onEdit(entry)}
-              className="text-muted cursor-pointer hover:underline"
+              className="text-textmuted cursor-pointer hover:underline"
             >
               Edit
             </button>

@@ -64,7 +64,7 @@ function MyList() {
                 setIsSearchAnimeModalOpen(true);
                 clearQueryResults();
               }}
-              className="text-card text-muted border-2 w-[105px] h-[32px] justify-center items-center flex cursor-pointer hover:bg-text-muted hover:text-bg-dark"
+              className="text-p2 text-textmuted border-2 w-[105px] h-[32px] justify-center items-center flex cursor-pointer hover:bg-textmuted hover:text-dark"
             >
               Add Anime
             </button>
@@ -100,3 +100,4 @@ function MyList() {
 }
 
 export default MyList;
+

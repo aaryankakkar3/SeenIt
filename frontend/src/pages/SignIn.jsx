@@ -24,48 +24,48 @@ function SignIn() {
           SeenIt
         </div>
       </div>
-      <div className="w-[50%] flex flex-col items-center justify-center gap-[32px] text-base p-[64px]">
+      <div className="w-[50%] flex flex-col items-center justify-center gap-[32px] text-p1 p-[64px]">
         <div className="text-h1">Sign In</div>
         <div className="flex flex-col w-[100%] gap-[16px]">
-          <div className="w-[100%] h-[52px] bg-bg px-[30px]">
+          <div className="w-[100%] h-[52px] bg-medium px-[30px]">
             <input
               autoComplete="off"
               type="text"
               id="email"
               placeholder="Email"
-              className="w-[100%] h-[100%] placeholder:text-muted focus:outline-none"
+              className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
             />
           </div>
-          <div className="w-[100%] h-[52px] bg-bg flex flex-row px-[30px]">
+          <div className="w-[100%] h-[52px] bg-medium flex flex-row px-[30px]">
             <input
               autoComplete="off"
               type={showPassword ? "text" : "password"}
               id="password"
               placeholder="Password"
-              className="w-[100%] h-[100%] placeholder:text-muted focus:outline-none"
+              className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
             />
             <button onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? (
-                <EyeOff className="text-muted cursor-pointer h-[24px] w-[24px]" />
+                <EyeOff className="text-textmuted cursor-pointer h-[24px] w-[24px]" />
               ) : (
-                <Eye className="text-muted  cursor-pointer h-[24px] w-[24px]" />
+                <Eye className="text-textmuted  cursor-pointer h-[24px] w-[24px]" />
               )}
             </button>
           </div>
-          <button className="h-[32px] w-[100%] text-muted flex justify-end hover:underline cursor-pointer">
+          <button className="h-[32px] w-[100%] text-textmuted flex justify-end hover:underline cursor-pointer">
             Forgot Password?
           </button>
         </div>
         <div className="flex flex-col w-[100%] gap-[16px]">
-          <button className="h-[52px] w-[100%] bg-text flex justify-center items-center text-bg-dark font-semibold cursor-pointer hover:bg-text-muted">
+          <button className="h-[52px] w-[100%] bg-text flex justify-center items-center text-dark font-semibold cursor-pointer hover:bg-textmuted">
             Login
           </button>
-          <button className="h-[52px] w-[100%] bg-bg flex justify-center items-center text-text gap-[16px] cursor-pointer hover:bg-light">
+          <button className="h-[52px] w-[100%] bg-medium flex justify-center items-center text-text gap-[16px] cursor-pointer hover:bg-light">
             <FaGoogle className="w-36px h-36px" />
             <div>Sign in with Google</div>
           </button>
         </div>
-        <div className="text-muted">
+        <div className="text-textmuted">
           Don't have an account?{" "}
           <button className="text-primary hover:underline cursor-pointer">
             Sign In.
@@ -77,3 +77,4 @@ function SignIn() {
 }
 
 export default SignIn;
+
