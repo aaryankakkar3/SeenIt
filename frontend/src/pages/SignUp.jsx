@@ -1,12 +1,153 @@
-import React from "react";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { FaGoogle } from "react-icons/fa";
+import Dither from "../components/react-components/Dither";
+import { useAuthStore } from "../store/auth.store";
+import { toast } from "react-hot-toast";
 
 function SignUp() {
-  return <div>SignUp</div>;
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+  });
+  const { signup, isSigningUp } = useAuthStore();
+
+  const validateForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const fullNameWords = formData.fullName.trim().split(/\s+/);
+
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return false;
+    }
+
+    if (fullNameWords.length !== 2) {
+      toast.error(
+        "Full name must contain exactly two words (first and last name)"
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    signup(formData);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  return (
+    <div className="flex flex-row gap-[64px] h-[100vh] p-[64px] justify-center">
+      <div className="w-[50%] relative h-full rounded-[36px] overflow-hidden">
+        <Dither
+          waveColor={[0.784, 1, 0]}
+          disableAnimation={false}
+          enableMouseInteraction={true}
+          mouseRadius={0.3}
+          colorNum={4}
+          waveAmplitude={0.3}
+          waveFrequency={3}
+          waveSpeed={0.05}
+          className="absolute inset-0 w-full h-full"
+        />
+        <div className="absolute top-[60px] left-[60px] text-h1 font-semibold text-text cursor-pointer">
+          SeenIt
+        </div>
+      </div>
+      <div className="w-[50%] flex flex-col items-center justify-center gap-[32px] text-p1 p-[64px]">
+        <div className="text-h1">Sign Up</div>
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col w-[100%] gap-[16px]"
+        >
+          <div className="w-[100%] h-[52px] bg-medium px-[30px]">
+            <input
+              autoComplete="off"
+              type="text"
+              id="fullName"
+              placeholder="Full Name"
+              value={formData.fullName}
+              onChange={handleChange}
+              className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
+            />
+          </div>
+          <div className="w-[100%] h-[52px] bg-medium px-[30px]">
+            <input
+              autoComplete="off"
+              type="email"
+              id="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
+            />
+          </div>
+          <div className="w-[100%] h-[52px] bg-medium flex flex-row px-[30px]">
+            <input
+              autoComplete="off"
+              type={showPassword ? "text" : "password"}
+              id="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? (
+                <EyeOff className="text-textmuted cursor-pointer h-[24px] w-[24px]" />
+              ) : (
+                <Eye className="text-textmuted  cursor-pointer h-[24px] w-[24px]" />
+              )}
+            </button>
+          </div>
+          <button
+            type="button"
+            className="h-[32px] w-[100%] text-textmuted flex justify-end hover:underline cursor-pointer"
+          >
+            Forgot Password?
+          </button>
+        </form>
+        <div className="flex flex-col w-[100%] gap-[16px]">
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={isSigningUp}
+            className="h-[52px] w-[100%] bg-text flex justify-center items-center text-dark font-semibold cursor-pointer hover:bg-textmuted disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSigningUp ? "Signing Up..." : "Sign Up"}
+          </button>
+          <button className="h-[52px] w-[100%] bg-medium flex justify-center items-center text-text gap-[16px] cursor-pointer hover:bg-light">
+            <FaGoogle className="w-36px h-36px" />
+            <div>Sign up with Google</div>
+          </button>
+        </div>
+        <div className="text-textmuted">
+          Already have an account?{" "}
+          <button
+            className="text-primary hover:underline cursor-pointer"
+            onClick={() => (window.location.href = "/login")}
+          >
+            Sign In.
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default SignUp;
-
-
-
-
-

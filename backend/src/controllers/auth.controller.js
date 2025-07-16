@@ -8,11 +8,33 @@ export const signup = async (req, res) => {
     if (!fullName || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    if (password.length < 6) {
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
       return res
         .status(400)
-        .json({ message: "Password must be at least 6 characters" });
+        .json({ message: "Please enter a valid email address" });
     }
+
+    // Password validation
+    if (password.length < 8) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 8 characters long" });
+    }
+
+    // Full name validation
+    const fullNameWords = fullName.trim().split(/\s+/);
+    if (fullNameWords.length !== 2) {
+      return res
+        .status(400)
+        .json({
+          message:
+            "Full name must contain exactly two words (first and last name)",
+        });
+    }
+
     const user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: "Email already exists" });
 
@@ -40,12 +62,34 @@ export const signup = async (req, res) => {
     }
   } catch (error) {
     console.log("Error in signup controller", error.message);
+    // Handle mongoose validation errors
+    if (error.name === "ValidationError") {
+      const validationErrors = Object.values(error.errors).map(
+        (err) => err.message
+      );
+      return res.status(400).json({ message: validationErrors[0] });
+    }
     res.status(500).json({ message: "Internal server error" });
   }
 };
 export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res
+        .status(400)
+        .json({ message: "Please enter a valid email address" });
+    }
+
+    // Password validation
+    if (password.length < 8) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 8 characters long" });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });

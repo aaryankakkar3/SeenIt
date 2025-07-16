@@ -2,9 +2,42 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
 import Dither from "../components/react-components/Dither";
+import { useAuthStore } from "../store/auth.store";
+import { toast } from "react-hot-toast";
 
 function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const { login, isLoggingIn } = useAuthStore();
+
+  const validateForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    login(formData);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
 
   return (
     <div className="flex flex-row gap-[64px] h-[100vh] p-[64px] justify-center">
@@ -26,13 +59,18 @@ function SignIn() {
       </div>
       <div className="w-[50%] flex flex-col items-center justify-center gap-[32px] text-p1 p-[64px]">
         <div className="text-h1">Sign In</div>
-        <div className="flex flex-col w-[100%] gap-[16px]">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col w-[100%] gap-[16px]"
+        >
           <div className="w-[100%] h-[52px] bg-medium px-[30px]">
             <input
               autoComplete="off"
-              type="text"
+              type="email"
               id="email"
               placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
               className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
             />
           </div>
@@ -42,9 +80,14 @@ function SignIn() {
               type={showPassword ? "text" : "password"}
               id="password"
               placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
               className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
             />
-            <button onClick={() => setShowPassword(!showPassword)}>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+            >
               {showPassword ? (
                 <EyeOff className="text-textmuted cursor-pointer h-[24px] w-[24px]" />
               ) : (
@@ -52,13 +95,21 @@ function SignIn() {
               )}
             </button>
           </div>
-          <button className="h-[32px] w-[100%] text-textmuted flex justify-end hover:underline cursor-pointer">
+          <button
+            type="button"
+            className="h-[32px] w-[100%] text-textmuted flex justify-end hover:underline cursor-pointer"
+          >
             Forgot Password?
           </button>
-        </div>
+        </form>
         <div className="flex flex-col w-[100%] gap-[16px]">
-          <button className="h-[52px] w-[100%] bg-text flex justify-center items-center text-dark font-semibold cursor-pointer hover:bg-textmuted">
-            Login
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={isLoggingIn}
+            className="h-[52px] w-[100%] bg-text flex justify-center items-center text-dark font-semibold cursor-pointer hover:bg-textmuted disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoggingIn ? "Logging in..." : "Login"}
           </button>
           <button className="h-[52px] w-[100%] bg-medium flex justify-center items-center text-text gap-[16px] cursor-pointer hover:bg-light">
             <FaGoogle className="w-36px h-36px" />
@@ -67,8 +118,11 @@ function SignIn() {
         </div>
         <div className="text-textmuted">
           Don't have an account?{" "}
-          <button className="text-primary hover:underline cursor-pointer">
-            Sign In.
+          <button
+            className="text-primary hover:underline cursor-pointer"
+            onClick={() => (window.location.href = "/signup")}
+          >
+            Sign Up.
           </button>
         </div>
       </div>
@@ -77,4 +131,3 @@ function SignIn() {
 }
 
 export default SignIn;
-

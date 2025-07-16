@@ -6,15 +6,29 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      validate: {
+        validator: function (v) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        },
+        message: "Please enter a valid email address",
+      },
     },
     fullName: {
       type: String,
       required: true,
+      validate: {
+        validator: function (v) {
+          const words = v.trim().split(/\s+/);
+          return words.length === 2;
+        },
+        message:
+          "Full name must contain exactly two words (first and last name)",
+      },
     },
     password: {
       type: String,
       required: true,
-      minLength: 6,
+      minLength: [8, "Password must be at least 8 characters long"],
     },
   },
   { timestamps: true }
