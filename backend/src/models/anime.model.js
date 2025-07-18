@@ -40,7 +40,8 @@ const animeEntrySchema = new mongoose.Schema(
       min: [0, "Episodes watched cannot be negative"],
       validate: {
         validator: function (value) {
-          return value <= this.episodesTotal;
+          // Allow any value if episodesTotal is 0 (unknown)
+          return this.episodesTotal === 0 || value <= this.episodesTotal;
         },
         message: "Episodes watched cannot exceed total episodes",
       },
