@@ -12,7 +12,8 @@ function handleError(res, error, context = "") {
 
 export const getAllEntries = async (req, res) => {
   try {
-    const animes = await Anime.find({});
+    // Only get animes for the authenticated user
+    const animes = await Anime.find({ userId: req.user._id });
     res.status(200).json({ success: true, data: animes });
   } catch (error) {
     handleError(res, error, "Get All Entries");
@@ -37,6 +38,9 @@ export const createEntry = async (req, res) => {
       .status(400)
       .json({ success: false, message: "Error in fetching ID from database" });
   }
+
+  // Add the authenticated user's ID to the anime entry
+  anime.userId = req.user._id;
 
   const newEntry = new Anime(anime);
 
@@ -63,9 +67,12 @@ export const updateEntry = async (req, res) => {
   }
 
   try {
-    const updatedEntry = await Anime.findByIdAndUpdate(id, anime, {
-      new: true,
-    });
+    // Only update if the anime belongs to the authenticated user
+    const updatedEntry = await Anime.findOneAndUpdate(
+      { _id: id, userId: req.user._id },
+      anime,
+      { new: true }
+    );
     if (!updatedEntry) {
       return res
         .status(404)
@@ -87,7 +94,11 @@ export const deleteEntry = async (req, res) => {
   }
 
   try {
-    const deleted = await Anime.findByIdAndDelete(id);
+    // Only delete if the anime belongs to the authenticated user
+    const deleted = await Anime.findOneAndDelete({
+      _id: id,
+      userId: req.user._id,
+    });
     if (!deleted) {
       return res
         .status(404)
@@ -109,7 +120,8 @@ export const incrementWatchedEpisodes = async (req, res) => {
   }
 
   try {
-    const anime = await Anime.findById(id);
+    // Only find anime that belongs to the authenticated user
+    const anime = await Anime.findOne({ _id: id, userId: req.user._id });
     if (!anime) {
       return res
         .status(404)
@@ -162,7 +174,8 @@ export const decrementWatchedEpisodes = async (req, res) => {
   }
 
   try {
-    const anime = await Anime.findById(id);
+    // Only find anime that belongs to the authenticated user
+    const anime = await Anime.findOne({ _id: id, userId: req.user._id });
     if (!anime) {
       return res
         .status(404)

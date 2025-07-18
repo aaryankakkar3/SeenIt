@@ -71,6 +71,7 @@ function SignIn() {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
               className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
             />
           </div>
@@ -82,6 +83,7 @@ function SignIn() {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
               className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
             />
             <button

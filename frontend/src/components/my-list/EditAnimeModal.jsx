@@ -98,6 +98,40 @@ export default function EditAnimeModal({
     }
   };
 
+  // Handle form submission
+  const handleSubmit = async () => {
+    // Validate input before submission
+    const validationErrors = validateInput();
+    if (validationErrors.length > 0) {
+      validationErrors.forEach((error) => toast.error(error));
+      return;
+    }
+
+    try {
+      const animeData = {
+        ...modalData,
+        yourStatus: selectedStatus,
+        episodesWatched: parseInt(watchedEp) || 0,
+        rating: parseFloat(rating) || 0,
+      };
+
+      if (isEditing) {
+        await editAnime(editingEntry._id, animeData);
+        toast.success("Anime updated successfully!");
+      } else {
+        await createAnime(animeData);
+        toast.success("Anime added successfully!");
+        // Clear search results and reset form when adding new anime
+        clearQueryResults();
+      }
+
+      onCloseAll();
+    } catch (error) {
+      console.error("Error saving anime:", error);
+      toast.error("Failed to save anime. Please try again.");
+    }
+  };
+
   // Handle status change with auto-fill episodes
   const handleStatusChange = (status) => {
     setSelectedStatus(status);
@@ -186,9 +220,10 @@ export default function EditAnimeModal({
                       type="number"
                       value={watchedEp}
                       onChange={handleEpisodesWatchedChange}
+                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                       id="episodesWatched"
                       min="0"
-                      max={episodesTotal || undefined}
+                      max={episodesTotal > 0 ? episodesTotal : undefined}
                       placeholder={`0 - ${episodesTotal || "?"}`}
                       className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
@@ -202,6 +237,7 @@ export default function EditAnimeModal({
                       type="number"
                       id="rating"
                       onChange={handleRatingChange}
+                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                       value={rating}
                       min="0"
                       max="5"
@@ -215,38 +251,7 @@ export default function EditAnimeModal({
             </div>
             <div className="w-full h-[40px] flex flex-row gap-[12px]">
               <button
-                onClick={async () => {
-                  // Validate input before submission
-                  const validationErrors = validateInput();
-                  if (validationErrors.length > 0) {
-                    validationErrors.forEach((error) => toast.error(error));
-                    return;
-                  }
-
-                  try {
-                    const animeData = {
-                      ...modalData,
-                      yourStatus: selectedStatus,
-                      episodesWatched: parseInt(watchedEp) || 0,
-                      rating: parseFloat(rating) || 0,
-                    };
-
-                    if (isEditing) {
-                      await editAnime(editingEntry._id, animeData);
-                      toast.success("Anime updated successfully!");
-                    } else {
-                      await createAnime(animeData);
-                      toast.success("Anime added successfully!");
-                      // Clear search results and reset form when adding new anime
-                      clearQueryResults();
-                    }
-
-                    onCloseAll();
-                  } catch (error) {
-                    console.error("Error saving anime:", error);
-                    toast.error("Failed to save anime. Please try again.");
-                  }
-                }}
+                onClick={handleSubmit}
                 className="bg-primary w-full h-[40px] text-dark hover:opacity-90 font-semibold flex justify-center items-center cursor-pointer"
               >
                 {isEditing ? "Update Anime" : "Add Anime"}

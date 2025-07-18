@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const animeEntrySchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -32,6 +37,11 @@ const animeEntrySchema = new mongoose.Schema(
     },
     jikanId: {
       type: Number,
+      required: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     episodesWatched: {

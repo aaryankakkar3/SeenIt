@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import { useAnimeExternalStore } from "../../store/anime.external.store";
 import { useAnimeBackendStore } from "../../store/anime.backend.store";
 import QueryItem from "./QueryItem";
 
 export default function SearchModal({ isOpen, onClose, onSelectResult }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const { queryResults, getQueryResults } = useAnimeExternalStore();
+  const { queryResults, isSearching, getQueryResults } =
+    useAnimeExternalStore();
   const { entries } = useAnimeBackendStore();
 
   // Get user anime IDs from entries
@@ -53,24 +54,37 @@ export default function SearchModal({ isOpen, onClose, onSelectResult }) {
           </div>
           <button
             onClick={() => getQueryResults(searchQuery)}
-            className="h-[32px] w-[78px] text-dark bg-primary hover:opacity-90 flex justify-center items-center font-semibold cursor-pointer"
+            disabled={isSearching}
+            className="h-[32px] w-[78px] text-dark bg-primary hover:opacity-90 flex justify-center items-center font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Search
+            {isSearching ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "Search"
+            )}
           </button>
         </div>
         <div className="h-[360px] w-[400px] bg-light flex flex-col overflow-y-auto">
-          {filteredResults.length === 0 && queryResults.length > 0 && (
-            <div className="text-textmuted p-4 text-center">
-              All search results are already in your list
+          {isSearching ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="w-8 h-8 animate-spin text-textmuted" />
             </div>
+          ) : (
+            <>
+              {filteredResults.length === 0 && queryResults.length > 0 && (
+                <div className="text-textmuted p-4 text-center">
+                  All search results are already in your list
+                </div>
+              )}
+              {filteredResults.map((queryResult, idx) => (
+                <QueryItem
+                  key={idx}
+                  queryResult={queryResult}
+                  onSelect={onSelectResult}
+                />
+              ))}
+            </>
           )}
-          {filteredResults.map((queryResult, idx) => (
-            <QueryItem
-              key={idx}
-              queryResult={queryResult}
-              onSelect={onSelectResult}
-            />
-          ))}
         </div>
       </div>
     </div>

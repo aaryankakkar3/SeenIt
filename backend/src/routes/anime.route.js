@@ -7,19 +7,21 @@ import {
   incrementWatchedEpisodes,
   decrementWatchedEpisodes,
 } from "../controllers/anime.controller.js";
+import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 export default router;
 
-router.get("/", getAllEntries);
+// All anime routes require authentication
+router.get("/", protectRoute, getAllEntries);
 
-router.post("/", createEntry);
+router.post("/", protectRoute, createEntry);
 
-router.delete("/:id", deleteEntry);
+router.delete("/:id", protectRoute, deleteEntry);
 
-router.put("/:id", updateEntry);
+router.put("/:id", protectRoute, updateEntry);
 
-router.patch("/:id/increment", incrementWatchedEpisodes);
+router.patch("/:id/increment", protectRoute, incrementWatchedEpisodes);
 
-router.patch("/:id/decrement", decrementWatchedEpisodes);
+router.patch("/:id/decrement", protectRoute, decrementWatchedEpisodes);

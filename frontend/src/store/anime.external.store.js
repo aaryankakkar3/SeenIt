@@ -3,12 +3,15 @@ import { create } from "zustand";
 
 export const useAnimeExternalStore = create((set) => ({
   queryResults: [],
+  isSearching: false,
 
   getQueryResults: async (query) => {
     if (!query || query.trim() === "") {
       set({ queryResults: [] });
       return;
     }
+
+    set({ isSearching: true });
 
     try {
       const response = await fetch(
@@ -25,11 +28,12 @@ export const useAnimeExternalStore = create((set) => ({
         animeStatus: anime.status || "Unknown",
       }));
 
-      set({ queryResults: filteredResults });
+      set({ queryResults: filteredResults, isSearching: false });
       console.log("Query results:", filteredResults);
     } catch (error) {
       toast.error("Failed to fetch animes from external database.");
       console.error("Error in fetching from external database.:", error);
+      set({ isSearching: false });
     }
   },
 
@@ -37,8 +41,3 @@ export const useAnimeExternalStore = create((set) => ({
     set({ queryResults: [] });
   },
 }));
-
-
-
-
-

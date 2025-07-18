@@ -56,6 +56,7 @@ export const useAnimeBackendStore = create((set) => ({
 
       if (
         currentEntry &&
+        currentEntry.episodesTotal > 0 &&
         currentEntry.episodesWatched >= currentEntry.episodesTotal
       ) {
         toast.error("Cannot increment past total episodes");

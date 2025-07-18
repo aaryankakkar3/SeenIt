@@ -80,6 +80,7 @@ function SignUp() {
               placeholder="Full Name"
               value={formData.fullName}
               onChange={handleChange}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
               className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
             />
           </div>
@@ -91,6 +92,7 @@ function SignUp() {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
               className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
             />
           </div>
@@ -102,6 +104,7 @@ function SignUp() {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
               className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
             />
             <button
