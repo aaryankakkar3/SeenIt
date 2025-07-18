@@ -116,19 +116,33 @@ export const incrementWatchedEpisodes = async (req, res) => {
         .json({ success: false, message: "Entry not found" });
     }
 
-    // Don't increment past total episodes
-    if (anime.episodesWatched >= anime.episodesTotal) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Cannot increment past total episodes",
-        });
+    // Don't increment past total episodes (unless total is 0/unknown)
+    if (
+      anime.episodesTotal > 0 &&
+      anime.episodesWatched >= anime.episodesTotal
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot increment past total episodes",
+      });
+    }
+
+    const newEpisodesWatched = anime.episodesWatched + 1;
+
+    // Determine new status based on episodes watched
+    let newStatus = anime.yourStatus;
+    if (anime.episodesTotal > 0 && newEpisodesWatched >= anime.episodesTotal) {
+      newStatus = "Completed";
+    } else if (anime.yourStatus === "Planned") {
+      newStatus = "Active";
     }
 
     const updatedEntry = await Anime.findByIdAndUpdate(
       id,
-      { $inc: { episodesWatched: 1 } },
+      {
+        $inc: { episodesWatched: 1 },
+        yourStatus: newStatus,
+      },
       { new: true }
     );
 
@@ -162,9 +176,24 @@ export const decrementWatchedEpisodes = async (req, res) => {
         .json({ success: false, message: "Cannot decrement below 0 episodes" });
     }
 
+    const newEpisodesWatched = anime.episodesWatched - 1;
+
+    // Determine new status based on episodes watched
+    let newStatus = anime.yourStatus;
+    if (
+      anime.yourStatus === "Completed" &&
+      anime.episodesTotal > 0 &&
+      newEpisodesWatched < anime.episodesTotal
+    ) {
+      newStatus = "Active";
+    }
+
     const updatedEntry = await Anime.findByIdAndUpdate(
       id,
-      { $inc: { episodesWatched: -1 } },
+      {
+        $inc: { episodesWatched: -1 },
+        yourStatus: newStatus,
+      },
       { new: true }
     );
 
