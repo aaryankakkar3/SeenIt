@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import Anime from "../models/anime.model.js";
+import AnimeCache from "../models/animeCache.model.js";
+import { getCachedAnime, cacheAnimeFromSearch } from "../services/animeCacheService.js";
 
 function handleError(res, error, context = "") {
   console.error(`[AnimeController] ${context}:`, error?.message || error);
@@ -12,9 +14,56 @@ function handleError(res, error, context = "") {
 
 export const getAllEntries = async (req, res) => {
   try {
-    // Only get animes for the authenticated user
-    const animes = await Anime.find({ userId: req.user._id });
-    res.status(200).json({ success: true, data: animes });
+    // Get all user anime entries
+    const userEntries = await Anime.find({ userId: req.user._id });
+    
+    // Combine with cached anime data
+    const combinedEntries = await Promise.all(
+      userEntries.map(async (entry) => {
+        try {
+          // Get cached anime data (will refresh if stale)
+          const cachedAnime = await getCachedAnime(entry.jikanId);
+          
+          return {
+            _id: entry._id,
+            userId: entry.userId,
+            jikanId: entry.jikanId,
+            yourStatus: entry.yourStatus,
+            rating: entry.rating,
+            episodesWatched: entry.episodesWatched,
+            // Cached anime data
+            title: cachedAnime.title,
+            imageUrl: cachedAnime.imageUrl,
+            year: cachedAnime.year,
+            episodesTotal: cachedAnime.episodesTotal,
+            animeStatus: cachedAnime.animeStatus,
+            createdAt: entry.createdAt,
+            updatedAt: entry.updatedAt,
+          };
+        } catch (cacheError) {
+          // If cache fails, return entry with basic info
+          console.error(`Failed to get cached data for anime ${entry.jikanId}:`, cacheError);
+          return {
+            _id: entry._id,
+            userId: entry.userId,
+            jikanId: entry.jikanId,
+            yourStatus: entry.yourStatus,
+            rating: entry.rating,
+            episodesWatched: entry.episodesWatched,
+            // Fallback data
+            title: "Unknown Title",
+            imageUrl: "https://placehold.co/90x129",
+            year: 0,
+            episodesTotal: 0,
+            animeStatus: "Unknown",
+            createdAt: entry.createdAt,
+            updatedAt: entry.updatedAt,
+          };
+        }
+      })
+    );
+    
+    res.status(200).json({ success: true, data: combinedEntries });
   } catch (error) {
     handleError(res, error, "Get All Entries");
   }
@@ -22,31 +71,61 @@ export const getAllEntries = async (req, res) => {
 
 export const createEntry = async (req, res) => {
   // Remove empty string fields so Mongoose uses defaults
-  const anime = Object.fromEntries(
+  const animeData = Object.fromEntries(
     Object.entries(req.body).filter(([_, v]) => v !== "")
   );
 
-  if (!anime.title || !anime.yourStatus) {
+  if (!animeData.yourStatus) {
     return res.status(400).json({
       success: false,
-      message: "Title and Your Status are compulsary fields",
+      message: "Your Status is a compulsary field",
     });
   }
 
-  if (!anime.jikanId) {
+  if (!animeData.jikanId) {
     return res
       .status(400)
       .json({ success: false, message: "Error in fetching ID from database" });
   }
 
-  // Add the authenticated user's ID to the anime entry
-  anime.userId = req.user._id;
-
-  const newEntry = new Anime(anime);
-
   try {
+    // First, cache the anime data from search results
+    await cacheAnimeFromSearch(animeData);
+    
+    // Create user-specific anime entry with only relevant fields
+    const userEntry = {
+      userId: req.user._id,
+      jikanId: animeData.jikanId,
+      yourStatus: animeData.yourStatus,
+      rating: animeData.rating,
+      episodesWatched: animeData.episodesWatched || 0,
+    };
+
+    const newEntry = new Anime(userEntry);
     await newEntry.save();
-    res.status(201).json({ success: true, data: newEntry });
+    
+    // Get the cached anime data to return complete entry
+    const cachedAnime = await getCachedAnime(animeData.jikanId);
+    
+    // Return combined data
+    const completeEntry = {
+      _id: newEntry._id,
+      userId: newEntry.userId,
+      jikanId: newEntry.jikanId,
+      yourStatus: newEntry.yourStatus,
+      rating: newEntry.rating,
+      episodesWatched: newEntry.episodesWatched,
+      // Cached anime data
+      title: cachedAnime.title,
+      imageUrl: cachedAnime.imageUrl,
+      year: cachedAnime.year,
+      episodesTotal: cachedAnime.episodesTotal,
+      animeStatus: cachedAnime.animeStatus,
+      createdAt: newEntry.createdAt,
+      updatedAt: newEntry.updatedAt,
+    };
+    
+    res.status(201).json({ success: true, data: completeEntry });
   } catch (error) {
     handleError(res, error, "Create Entry");
   }
@@ -56,7 +135,7 @@ export const updateEntry = async (req, res) => {
   const { id } = req.params;
 
   // Remove empty string fields so Mongoose uses defaults if not present
-  const anime = Object.fromEntries(
+  const updateData = Object.fromEntries(
     Object.entries(req.body).filter(([_, v]) => v !== "")
   );
 
@@ -70,15 +149,38 @@ export const updateEntry = async (req, res) => {
     // Only update if the anime belongs to the authenticated user
     const updatedEntry = await Anime.findOneAndUpdate(
       { _id: id, userId: req.user._id },
-      anime,
+      updateData,
       { new: true }
     );
+    
     if (!updatedEntry) {
       return res
         .status(404)
         .json({ success: false, message: "Entry not found" });
     }
-    res.status(200).json({ success: true, data: updatedEntry });
+    
+    // Get cached anime data to return complete entry
+    const cachedAnime = await getCachedAnime(updatedEntry.jikanId);
+    
+    // Return combined data
+    const completeEntry = {
+      _id: updatedEntry._id,
+      userId: updatedEntry.userId,
+      jikanId: updatedEntry.jikanId,
+      yourStatus: updatedEntry.yourStatus,
+      rating: updatedEntry.rating,
+      episodesWatched: updatedEntry.episodesWatched,
+      // Cached anime data
+      title: cachedAnime.title,
+      imageUrl: cachedAnime.imageUrl,
+      year: cachedAnime.year,
+      episodesTotal: cachedAnime.episodesTotal,
+      animeStatus: cachedAnime.animeStatus,
+      createdAt: updatedEntry.createdAt,
+      updatedAt: updatedEntry.updatedAt,
+    };
+    
+    res.status(200).json({ success: true, data: completeEntry });
   } catch (error) {
     handleError(res, error, "Update Entry");
   }
@@ -128,10 +230,13 @@ export const incrementWatchedEpisodes = async (req, res) => {
         .json({ success: false, message: "Entry not found" });
     }
 
+    // Get cached anime data to check episodesTotal
+    const cachedAnime = await getCachedAnime(anime.jikanId);
+
     // Don't increment past total episodes (unless total is 0/unknown)
     if (
-      anime.episodesTotal > 0 &&
-      anime.episodesWatched >= anime.episodesTotal
+      cachedAnime.episodesTotal > 0 &&
+      anime.episodesWatched >= cachedAnime.episodesTotal
     ) {
       return res.status(400).json({
         success: false,
@@ -143,7 +248,7 @@ export const incrementWatchedEpisodes = async (req, res) => {
 
     // Determine new status based on episodes watched
     let newStatus = anime.yourStatus;
-    if (anime.episodesTotal > 0 && newEpisodesWatched >= anime.episodesTotal) {
+    if (cachedAnime.episodesTotal > 0 && newEpisodesWatched >= cachedAnime.episodesTotal) {
       newStatus = "Completed";
     } else if (anime.yourStatus === "Planned") {
       newStatus = "Active";
@@ -158,7 +263,25 @@ export const incrementWatchedEpisodes = async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json({ success: true, data: updatedEntry });
+    // Return combined data
+    const completeEntry = {
+      _id: updatedEntry._id,
+      userId: updatedEntry.userId,
+      jikanId: updatedEntry.jikanId,
+      yourStatus: updatedEntry.yourStatus,
+      rating: updatedEntry.rating,
+      episodesWatched: updatedEntry.episodesWatched,
+      // Cached anime data
+      title: cachedAnime.title,
+      imageUrl: cachedAnime.imageUrl,
+      year: cachedAnime.year,
+      episodesTotal: cachedAnime.episodesTotal,
+      animeStatus: cachedAnime.animeStatus,
+      createdAt: updatedEntry.createdAt,
+      updatedAt: updatedEntry.updatedAt,
+    };
+
+    res.status(200).json({ success: true, data: completeEntry });
   } catch (error) {
     handleError(res, error, "Increment Watched Episodes");
   }
@@ -191,12 +314,15 @@ export const decrementWatchedEpisodes = async (req, res) => {
 
     const newEpisodesWatched = anime.episodesWatched - 1;
 
+    // Get cached anime data to check episodesTotal
+    const cachedAnime = await getCachedAnime(anime.jikanId);
+
     // Determine new status based on episodes watched
     let newStatus = anime.yourStatus;
     if (
       anime.yourStatus === "Completed" &&
-      anime.episodesTotal > 0 &&
-      newEpisodesWatched < anime.episodesTotal
+      cachedAnime.episodesTotal > 0 &&
+      newEpisodesWatched < cachedAnime.episodesTotal
     ) {
       newStatus = "Active";
     }
@@ -210,7 +336,25 @@ export const decrementWatchedEpisodes = async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json({ success: true, data: updatedEntry });
+    // Return combined data
+    const completeEntry = {
+      _id: updatedEntry._id,
+      userId: updatedEntry.userId,
+      jikanId: updatedEntry.jikanId,
+      yourStatus: updatedEntry.yourStatus,
+      rating: updatedEntry.rating,
+      episodesWatched: updatedEntry.episodesWatched,
+      // Cached anime data
+      title: cachedAnime.title,
+      imageUrl: cachedAnime.imageUrl,
+      year: cachedAnime.year,
+      episodesTotal: cachedAnime.episodesTotal,
+      animeStatus: cachedAnime.animeStatus,
+      createdAt: updatedEntry.createdAt,
+      updatedAt: updatedEntry.updatedAt,
+    };
+
+    res.status(200).json({ success: true, data: completeEntry });
   } catch (error) {
     handleError(res, error, "Decrement Watched Episodes");
   }

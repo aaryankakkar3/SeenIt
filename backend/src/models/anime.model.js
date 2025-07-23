@@ -7,17 +7,9 @@ const animeEntrySchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    title: {
-      type: String,
-      required: true,
-    },
-    imageUrl: {
-      type: String,
-      default: "https://placehold.co/90x129",
-    },
-    year: {
+    jikanId: {
       type: Number,
-      default: "0000",
+      required: true,
     },
     yourStatus: {
       type: String,
@@ -35,40 +27,19 @@ const animeEntrySchema = new mongoose.Schema(
         message: "Rating must be between 0 and 5.",
       },
     },
-    jikanId: {
-      type: Number,
-      required: true,
-    },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
     episodesWatched: {
       type: Number,
       default: 0,
       min: [0, "Episodes watched cannot be negative"],
-      validate: {
-        validator: function (value) {
-          // Allow any value if episodesTotal is 0 (unknown)
-          return this.episodesTotal === 0 || value <= this.episodesTotal;
-        },
-        message: "Episodes watched cannot exceed total episodes",
-      },
-    },
-    episodesTotal: {
-      type: Number,
-      default: 0,
-    },
-    animeStatus: {
-      type: String,
-      default: "Unknown",
     },
   },
   {
     timestamps: true,
   }
 );
+
+// Index for efficient queries by userId and jikanId
+animeEntrySchema.index({ userId: 1, jikanId: 1 });
 
 const AnimeEntry = mongoose.model("Anime", animeEntrySchema);
 export default AnimeEntry;
