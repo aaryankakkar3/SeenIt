@@ -19,19 +19,17 @@ function SignUp() {
     const fullNameWords = formData.fullName.trim().split(/\s+/);
 
     if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
+      toast.error("Please enter a valid email address.");
       return false;
     }
 
     if (formData.password.length < 8) {
-      toast.error("Password must be at least 8 characters long");
+      toast.error("Password must be at least 8 characters long.");
       return false;
     }
 
     if (fullNameWords.length !== 2) {
-      toast.error(
-        "Full name must contain exactly two words (first and last name)"
-      );
+      toast.error("Full name must contain first name and last name.");
       return false;
     }
 

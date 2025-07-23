@@ -78,7 +78,6 @@ export default function EditAnimeModal({
       ) {
         setSelectedStatus("Completed");
         setWatchedEp(episodesTotal.toString());
-        toast.success("Status automatically set to Completed!");
       }
     }
   };
@@ -117,10 +116,8 @@ export default function EditAnimeModal({
 
       if (isEditing) {
         await editAnime(editingEntry._id, animeData);
-        toast.success("Anime updated successfully!");
       } else {
         await createAnime(animeData);
-        toast.success("Anime added successfully!");
         // Clear search results and reset form when adding new anime
         clearQueryResults();
       }
@@ -128,7 +125,7 @@ export default function EditAnimeModal({
       onCloseAll();
     } catch (error) {
       console.error("Error saving anime:", error);
-      toast.error("Failed to save anime. Please try again.");
+      toast.error("Failed to save anime.");
     }
   };
 
@@ -137,7 +134,6 @@ export default function EditAnimeModal({
     setSelectedStatus(status);
     if (status === "Completed" && episodesTotal > 0) {
       setWatchedEp(episodesTotal.toString());
-      toast.success("Episodes watched automatically set to total episodes!");
     }
   };
 
@@ -267,13 +263,10 @@ export default function EditAnimeModal({
                     ) {
                       try {
                         await deleteAnime(editingEntry._id);
-                        toast.success("Anime deleted successfully!");
                         onCloseAll();
                       } catch (error) {
                         console.error("Error deleting anime:", error);
-                        toast.error(
-                          "Failed to delete anime. Please try again."
-                        );
+                        toast.error("Failed to delete anime.");
                       }
                     }
                   }}

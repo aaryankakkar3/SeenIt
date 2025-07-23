@@ -31,7 +31,7 @@ export const useAnimeExternalStore = create((set) => ({
       set({ queryResults: filteredResults, isSearching: false });
       console.log("Query results:", filteredResults);
     } catch (error) {
-      toast.error("Failed to fetch animes from external database.");
+      toast.error("Failed to fetch entries.");
       console.error("Error in fetching from external database.:", error);
       set({ isSearching: false });
     }

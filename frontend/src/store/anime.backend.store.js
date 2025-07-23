@@ -21,9 +21,9 @@ export const useAnimeBackendStore = create((set) => ({
       set((state) => ({
         entries: [...state.entries, response.data.data],
       }));
-      toast.success("Anime entry created successfully");
+      toast.success("Entry created successfully");
     } catch (error) {
-      toast.error("Failed to create anime entry");
+      toast.error("Failed to create entry");
       console.error("Error creating anime entry:", error);
     }
   },
@@ -40,9 +40,9 @@ export const useAnimeBackendStore = create((set) => ({
           entry._id === animeId ? response.data.data : entry
         ),
       }));
-      toast.success("Anime entry updated successfully");
+      toast.success("Entry updated successfully");
     } catch (error) {
-      toast.error("Failed to update anime entry");
+      toast.error("Failed to update entry");
       console.error("Error updating anime entry:", error);
     }
   },
@@ -59,7 +59,6 @@ export const useAnimeBackendStore = create((set) => ({
         currentEntry.episodesTotal > 0 &&
         currentEntry.episodesWatched >= currentEntry.episodesTotal
       ) {
-        toast.error("Cannot increment past total episodes");
         return;
       }
 
@@ -89,7 +88,6 @@ export const useAnimeBackendStore = create((set) => ({
         .entries.find((entry) => entry._id === animeId);
 
       if (currentEntry && currentEntry.episodesWatched <= 0) {
-        toast.error("Cannot decrement below 0 episodes");
         return;
       }
 
@@ -117,9 +115,9 @@ export const useAnimeBackendStore = create((set) => ({
       set((state) => ({
         entries: state.entries.filter((entry) => entry._id !== animeId),
       }));
-      toast.success("Anime entry deleted successfully");
+      toast.success("Entry deleted successfully");
     } catch (error) {
-      toast.error("Failed to delete anime entry");
+      toast.error("Failed to delete entry");
       console.error("Error deleting anime entry:", error);
     }
   },
