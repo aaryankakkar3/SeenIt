@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
+import { GoogleLogin } from "@react-oauth/google";
 import Dither from "../components/react-components/Dither";
 import { useAuthStore } from "../store/auth.store";
 import { toast } from "react-hot-toast";
@@ -11,7 +12,16 @@ function SignIn() {
     email: "",
     password: "",
   });
-  const { login, isLoggingIn } = useAuthStore();
+  const { login, isLoggingIn, googleAuth, isGoogleLoading } = useAuthStore();
+
+  const handleGoogleSuccess = (credentialResponse) => {
+    console.log("Google auth started, isGoogleLoading:", isGoogleLoading);
+    googleAuth(credentialResponse.credential, false);
+  };
+
+  const handleGoogleError = () => {
+    toast.error("Google sign in failed");
+  };
 
   const validateForm = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -113,10 +123,35 @@ function SignIn() {
           >
             {isLoggingIn ? "Logging in..." : "Login"}
           </button>
-          <button className="h-[52px] w-[100%] bg-medium flex justify-center items-center text-text gap-[16px] cursor-pointer hover:bg-light">
-            <FaGoogle className="w-36px h-36px" />
-            <div>Sign in with Google</div>
-          </button>
+          <div className="relative h-[52px] w-[100%] group">
+            <button
+              className={`h-[52px] w-[100%] bg-medium flex justify-center items-center text-text gap-[16px] cursor-pointer group-hover:bg-light transition-colors ${
+                isGoogleLoading ? "opacity-50" : ""
+              }`}
+              disabled={isGoogleLoading}
+            >
+              <FaGoogle className="w-36px h-36px" />
+              <div>
+                {isGoogleLoading
+                  ? "Signing in with Google..."
+                  : "Sign in with Google"}
+              </div>
+            </button>
+            {/* Invisible GoogleLogin component positioned over custom button */}
+            <div
+              className={`absolute inset-0 ${
+                isGoogleLoading ? "pointer-events-none" : "pointer-events-auto"
+              }`}
+              style={{ opacity: 0 }}
+            >
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                width="100%"
+                size="large"
+              />
+            </div>
+          </div>
         </div>
         <div className="text-textmuted">
           Don't have an account?{" "}

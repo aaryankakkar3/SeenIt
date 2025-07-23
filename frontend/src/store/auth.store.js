@@ -8,6 +8,7 @@ export const useAuthStore = create((set) => ({
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
+  isGoogleLoading: false,
 
   isCheckingAuth: true,
 
@@ -67,6 +68,26 @@ export const useAuthStore = create((set) => ({
       toast.success("Logged out successfully");
     } catch (error) {
       toast.error(error.response.data.message);
+    }
+  },
+
+  googleAuth: async (credential, isSignUp = false) => {
+    try {
+      set({ isGoogleLoading: true });
+      const endpoint = isSignUp ? "/auth/google-signup" : "/auth/google-signin";
+      const res = await axiosInstance.post(endpoint, { credential });
+      set({
+        authUser: res.data.user,
+      });
+      toast.success(
+        isSignUp ? "Account created successfully" : "Logged in successfully"
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Google authentication failed"
+      );
+    } finally {
+      set({ isGoogleLoading: false });
     }
   },
 }));
