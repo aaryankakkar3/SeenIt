@@ -33,19 +33,19 @@ export default function Card({ entry, onEdit }) {
 
   if (yourStatus === "Active") {
     statusBg = "#00FFB7";
-    statusText = "text-dark";
+    statusText = "text-[#000000]";
     statusBorder = "";
   } else if (yourStatus === "Planned") {
     statusBg = "#3700FF";
-    statusText = "text-text";
+    statusText = "text-[#f2f2f2]";
     statusBorder = "";
   } else if (yourStatus === "Completed") {
     statusBg = "#FF0048";
-    statusText = "text-text";
+    statusText = "text-[#000000]";
     statusBorder = "";
   } else if (yourStatus === "Dropped") {
     statusBg = "#fff";
-    statusText = "text-dark";
+    statusText = "text-[#f2f2f2]";
     statusBorder = "border border-white";
   }
 

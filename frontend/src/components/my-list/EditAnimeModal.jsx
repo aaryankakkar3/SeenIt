@@ -188,7 +188,7 @@ export default function EditAnimeModal({
                       <button
                         key={status}
                         onClick={() => handleStatusChange(status)}
-                        className={`bg-light w-full h-[40px] px-[12px] flex items-center cursor-pointer hover:border-white transition-colors ${
+                        className={`bg-light w-full h-[40px] px-[12px] flex items-center cursor-pointer hover:border-text transition-colors ${
                           selectedStatus === status
                             ? "border-2 border-text"
                             : "border-2 border-transparent"
@@ -278,7 +278,7 @@ export default function EditAnimeModal({
 
               <button
                 onClick={onClose}
-                className="bg-light w-full hover:border h-[40px] text-text flex justify-center items-center cursor-pointer"
+                className="bg-light w-full border-2 border-transparent hover:border-text h-[40px] text-text flex justify-center items-center cursor-pointer"
               >
                 Go Back
               </button>
