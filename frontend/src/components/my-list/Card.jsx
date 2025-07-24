@@ -1,7 +1,7 @@
 import { Plus, Minus, Star } from "lucide-react";
 import { useAnimeBackendStore } from "../../store/anime.backend.store";
 
-export default function Card({ entry, onEdit }) {
+export default function Card({ entry, onEdit, mediaConfig }) {
   const { incrementEpisodes, decrementEpisodes } = useAnimeBackendStore();
 
   const {
@@ -9,12 +9,24 @@ export default function Card({ entry, onEdit }) {
     title,
     year,
     animeStatus,
+    mangaStatus,
+    showStatus,
+    comicStatus,
     yourStatus,
     episodesWatched,
+    chaptersRead,
+    issuesRead,
     episodesTotal,
+    chaptersTotal,
+    issuesTotal,
     rating,
     imageUrl,
   } = entry;
+
+  // Get the correct status and progress values based on media type
+  const mediaStatus = entry[mediaConfig.statusField] || animeStatus;
+  const watchedCount = entry[mediaConfig.watchedField] || episodesWatched || 0;
+  const totalCount = entry[mediaConfig.releasedField] || episodesTotal || 0;
   const maxStars = 5;
   const filledStars = Math.floor(rating);
   const stars = Array.from({ length: maxStars }, (_, i) => (
@@ -59,7 +71,7 @@ export default function Card({ entry, onEdit }) {
           </div>
           <div className="text-textmuted text-p2 flex flex-row gap-[12px]">
             <div className="">{year}</div>
-            <div className="">{animeStatus}</div>
+            <div className="">{mediaStatus}</div>
           </div>
         </div>
         <div className="flex flex-col gap-[4px] ">
@@ -75,7 +87,7 @@ export default function Card({ entry, onEdit }) {
           </div>
           <div className="flex flex-row gap-[8px]">
             <div className="text-text">
-              {episodesWatched}/{episodesTotal}
+              {watchedCount}/{totalCount}
             </div>
             <div className="flex flex-row gap-[4px]">
               <button

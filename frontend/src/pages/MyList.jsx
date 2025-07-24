@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import MediaSection from "../components/my-list/MediaSection";
 import SearchModal from "../components/my-list/SearchModal";
 import EditAnimeModal from "../components/my-list/EditAnimeModal";
+import AddSectionModal from "../components/my-list/AddSectionModal";
 import { useSectionsStore } from "../store/sections.store";
 
 function MyList() {
   const [isSearchAnimeModalOpen, setIsSearchAnimeModalOpen] = useState(false);
   const [isEditAnimeModalOpen, setIsEditAnimeModalOpen] = useState(false);
+  const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false);
   const [selectedQueryResult, setSelectedQueryResult] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
 
@@ -18,8 +20,18 @@ function MyList() {
     getSections();
   }, [getSections]);
 
-  // Check if 'animes' section exists
+  // Check if sections exist
   const hasSections = sections.length > 0;
+
+  // Function to handle opening add section modal
+  const handleOpenAddSectionModal = () => {
+    setIsAddSectionModalOpen(true);
+  };
+
+  // Function to close add section modal
+  const handleCloseAddSectionModal = () => {
+    setIsAddSectionModalOpen(false);
+  };
 
   // Function to handle editing an entry
   const handleEdit = (entry) => {
@@ -29,7 +41,7 @@ function MyList() {
   };
 
   // Function to handle opening search modal
-  const handleOpenSearchModal = () => {
+  const handleOpenSearchModal = (sectionType) => {
     setIsSearchAnimeModalOpen(true);
   };
 
@@ -65,7 +77,10 @@ function MyList() {
       {!hasSections ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-[32px]">
           <div className="text-h1 text-text ">No sections added</div>
-          <button className="bg-primary text-dark h-[32px] w-[122px] text-p2 font-semibold cursor-pointer hover:opacity-90">
+          <button
+            onClick={handleOpenAddSectionModal}
+            className="bg-primary text-dark h-[32px] w-[122px] text-p2 font-semibold cursor-pointer hover:opacity-90"
+          >
             Add Section
           </button>
         </div>
@@ -81,6 +96,14 @@ function MyList() {
                 thisSection={section}
               />
             ))}
+            <div className="w-full flex h-fit justify-center items-center">
+              <button
+                onClick={handleOpenAddSectionModal}
+                className="bg-primary text-dark h-[32px] w-[122px] text-p2 font-semibold cursor-pointer hover:opacity-90"
+              >
+                Add Section
+              </button>
+            </div>
           </div>
 
           <SearchModal
@@ -98,6 +121,11 @@ function MyList() {
           />
         </>
       )}
+
+      <AddSectionModal
+        isOpen={isAddSectionModalOpen}
+        onClose={handleCloseAddSectionModal}
+      />
     </div>
   );
 }
