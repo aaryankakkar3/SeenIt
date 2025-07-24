@@ -1,6 +1,5 @@
 import Navbar from "../components/Navbar";
 import { useState, useEffect } from "react";
-import { useAnimeBackendStore } from "../store/anime.backend.store";
 import MediaSection from "../components/my-list/MediaSection";
 import SearchModal from "../components/my-list/SearchModal";
 import EditAnimeModal from "../components/my-list/EditAnimeModal";
@@ -12,18 +11,15 @@ function MyList() {
   const [selectedQueryResult, setSelectedQueryResult] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
 
-  const { getAnimes } = useAnimeBackendStore();
-  const { sections, getSections, addSection, deleteSection } =
-    useSectionsStore();
+  const { sections, getSections } = useSectionsStore();
 
-  // Fetch anime entries and sections when component mounts
-  useEffect(() => {
-    getAnimes();
-  }, [getAnimes]);
-
+  // Fetch sections when component mounts
   useEffect(() => {
     getSections();
   }, [getSections]);
+
+  // Check if 'animes' section exists
+  const hasSections = sections.length > 0;
 
   // Function to handle editing an entry
   const handleEdit = (entry) => {
@@ -63,28 +59,45 @@ function MyList() {
   };
 
   return (
-    <div className="p-[64px] flex flex-col gap-[40px]">
+    <div className="px-[64px] py-[32px] flex flex-col gap-[40px] min-h-screen">
       <Navbar />
-      <div className="flex flex-col gap-[32px]">
-        <MediaSection
-          onEdit={handleEdit}
-          onOpenSearchModal={handleOpenSearchModal}
-        />
-      </div>
 
-      <SearchModal
-        isOpen={isSearchAnimeModalOpen}
-        onClose={handleCloseSearchModal}
-        onSelectResult={handleSelectQueryResult}
-      />
+      {!hasSections ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-[32px]">
+          <div className="text-h1 text-text ">No sections added</div>
+          <button className="bg-primary text-dark h-[32px] w-[122px] text-p2 font-semibold cursor-pointer hover:opacity-90">
+            Add Section
+          </button>
+        </div>
+      ) : (
+        // Show normal content if sections exist
+        <>
+          <div className="flex flex-col gap-[32px]">
+            {sections.map((section, index) => (
+              <MediaSection
+                key={index}
+                onEdit={handleEdit}
+                onOpenSearchModal={handleOpenSearchModal}
+                thisSection={section}
+              />
+            ))}
+          </div>
 
-      <EditAnimeModal
-        isOpen={isEditAnimeModalOpen}
-        onClose={handleCloseEditModal}
-        onCloseAll={handleCloseAllModals}
-        editingEntry={editingEntry}
-        selectedQueryResult={selectedQueryResult}
-      />
+          <SearchModal
+            isOpen={isSearchAnimeModalOpen}
+            onClose={handleCloseSearchModal}
+            onSelectResult={handleSelectQueryResult}
+          />
+
+          <EditAnimeModal
+            isOpen={isEditAnimeModalOpen}
+            onClose={handleCloseEditModal}
+            onCloseAll={handleCloseAllModals}
+            editingEntry={editingEntry}
+            selectedQueryResult={selectedQueryResult}
+          />
+        </>
+      )}
     </div>
   );
 }
