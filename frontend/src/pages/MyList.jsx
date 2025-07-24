@@ -4,6 +4,7 @@ import { useAnimeBackendStore } from "../store/anime.backend.store";
 import MediaSection from "../components/my-list/MediaSection";
 import SearchModal from "../components/my-list/SearchModal";
 import EditAnimeModal from "../components/my-list/EditAnimeModal";
+import { useSectionsStore } from "../store/sections.store";
 
 function MyList() {
   const [isSearchAnimeModalOpen, setIsSearchAnimeModalOpen] = useState(false);
@@ -12,11 +13,17 @@ function MyList() {
   const [editingEntry, setEditingEntry] = useState(null);
 
   const { getAnimes } = useAnimeBackendStore();
+  const { sections, getSections, addSection, deleteSection } =
+    useSectionsStore();
 
-  // Fetch anime entries when component mounts
+  // Fetch anime entries and sections when component mounts
   useEffect(() => {
     getAnimes();
   }, [getAnimes]);
+
+  useEffect(() => {
+    getSections();
+  }, [getSections]);
 
   // Function to handle editing an entry
   const handleEdit = (entry) => {

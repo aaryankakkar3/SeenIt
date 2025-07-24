@@ -2,8 +2,7 @@ import User from "../models/user.model.js";
 
 export const addSection = async (req, res) => {
   const { section } = req.params;
-  const { userId } = req.body;
-  //   const userId = req.user._id;
+  const userId = req.user._id;
 
   try {
     // Validate that section is provided
@@ -44,8 +43,7 @@ export const addSection = async (req, res) => {
 
 export const deleteSection = async (req, res) => {
   const { section } = req.params;
-  const { userId } = req.body;
-  // const userId = req.user._id; // Assuming you have auth middleware that sets req.user
+  const userId = req.user._id;
 
   try {
     // Validate that section is provided
@@ -87,8 +85,7 @@ export const deleteSection = async (req, res) => {
 };
 
 export const getAllSections = async (req, res) => {
-  const { userId } = req.body;
-  // const userId = req.user._id; // Assuming you have auth middleware that sets req.user
+  const userId = req.user._id;
 
   try {
     // Find the user

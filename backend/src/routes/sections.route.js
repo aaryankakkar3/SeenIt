@@ -8,10 +8,10 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/", getAllSections);
+router.get("/", protectRoute, getAllSections);
 
-router.post("/:section", addSection);
+router.post("/:section", protectRoute, addSection);
 
-router.delete("/:section", deleteSection);
+router.delete("/:section", protectRoute, deleteSection);
 
 export default router;
