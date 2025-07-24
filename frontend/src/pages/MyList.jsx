@@ -1,8 +1,7 @@
 import Navbar from "../components/Navbar";
 import { useState, useEffect } from "react";
 import { useAnimeBackendStore } from "../store/anime.backend.store";
-import { useAnimeExternalStore } from "../store/anime.external.store";
-import Card from "../components/my-list/Card";
+import MediaSection from "../components/my-list/MediaSection";
 import SearchModal from "../components/my-list/SearchModal";
 import EditAnimeModal from "../components/my-list/EditAnimeModal";
 
@@ -12,8 +11,7 @@ function MyList() {
   const [selectedQueryResult, setSelectedQueryResult] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
 
-  const { entries, getAnimes } = useAnimeBackendStore();
-  const { clearQueryResults } = useAnimeExternalStore();
+  const { getAnimes } = useAnimeBackendStore();
 
   // Fetch anime entries when component mounts
   useEffect(() => {
@@ -25,6 +23,11 @@ function MyList() {
     setEditingEntry(entry);
     setSelectedQueryResult(entry);
     setIsEditAnimeModalOpen(true);
+  };
+
+  // Function to handle opening search modal
+  const handleOpenSearchModal = () => {
+    setIsSearchAnimeModalOpen(true);
   };
 
   // Function to handle selecting a query result from search
@@ -56,30 +59,10 @@ function MyList() {
     <div className="p-[64px] flex flex-col gap-[40px]">
       <Navbar />
       <div className="flex flex-col gap-[32px]">
-        <div className="flex flex-col gap-[16px]">
-          <div className="flex flex-row items-center justify-start gap-[16px]">
-            <div className="text-h2 text-text">Anime</div>
-            <button
-              onClick={() => {
-                setIsSearchAnimeModalOpen(true);
-                clearQueryResults();
-              }}
-              className="text-p2 text-textmuted border-2 w-[105px] h-[32px] justify-center items-center flex cursor-pointer hover:bg-textmuted hover:text-dark"
-            >
-              Add Anime
-            </button>
-          </div>
-          <div
-            className="grid gap-[12px]"
-            style={{
-              gridTemplateColumns: "repeat(auto-fit, minmax(370px, 1fr))",
-            }}
-          >
-            {entries.map((entry, idx) => (
-              <Card key={idx} entry={entry} onEdit={handleEdit} />
-            ))}
-          </div>
-        </div>
+        <MediaSection
+          onEdit={handleEdit}
+          onOpenSearchModal={handleOpenSearchModal}
+        />
       </div>
 
       <SearchModal
@@ -100,4 +83,3 @@ function MyList() {
 }
 
 export default MyList;
-

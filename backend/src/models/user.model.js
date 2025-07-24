@@ -34,6 +34,26 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    sections: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: function (v) {
+          const allowedSections = [
+            "animes",
+            "mangas",
+            "shows",
+            "comics",
+            "movies",
+            "books",
+            "games",
+          ];
+          return v.every((section) => allowedSections.includes(section));
+        },
+        message:
+          "Sections can only contain: animes, manga, shows, comics, movies, books, games",
+      },
+    },
   },
   { timestamps: true }
 );
