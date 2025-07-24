@@ -3,7 +3,6 @@ import { Toaster } from "react-hot-toast";
 import SignIn from "./pages/SignIn";
 import MyList from "./pages/MyList";
 import AI from "./pages/AI";
-import Friends from "./pages/Friends";
 import SignUp from "./pages/SignUp";
 import { useAuthStore } from "./store/auth.store";
 import { useEffect } from "react";
@@ -56,10 +55,6 @@ function App() {
         <Route
           path="/ai"
           element={authUser ? <AI /> : <Navigate to="/login" />}
-        ></Route>
-        <Route
-          path="/friends"
-          element={authUser ? <Friends /> : <Navigate to="/login" />}
         ></Route>
         <Route
           path="/signup"

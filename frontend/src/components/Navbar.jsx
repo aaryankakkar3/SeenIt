@@ -42,14 +42,6 @@ function Navbar() {
         >
           My List
         </div>
-        <div
-          className={`hover:underline cursor-pointer ${
-            isActive("/friends") ? "underline" : ""
-          }`}
-          onClick={() => navigate("/friends")}
-        >
-          Friends
-        </div>
         <div className="hover:underline cursor-pointer" onClick={handleLogout}>
           Logout
         </div>
