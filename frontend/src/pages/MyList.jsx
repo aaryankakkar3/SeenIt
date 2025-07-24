@@ -12,6 +12,7 @@ function MyList() {
   const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false);
   const [selectedQueryResult, setSelectedQueryResult] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
+  const [currentSection, setCurrentSection] = useState(null);
 
   const { sections, getSections } = useSectionsStore();
 
@@ -34,7 +35,8 @@ function MyList() {
   };
 
   // Function to handle editing an entry
-  const handleEdit = (entry) => {
+  const handleEdit = (entry, sectionType) => {
+    setCurrentSection(sectionType);
     setEditingEntry(entry);
     setSelectedQueryResult(entry);
     setIsEditAnimeModalOpen(true);
@@ -42,6 +44,7 @@ function MyList() {
 
   // Function to handle opening search modal
   const handleOpenSearchModal = (sectionType) => {
+    setCurrentSection(sectionType);
     setIsSearchAnimeModalOpen(true);
   };
 
@@ -118,6 +121,7 @@ function MyList() {
             onCloseAll={handleCloseAllModals}
             editingEntry={editingEntry}
             selectedQueryResult={selectedQueryResult}
+            currentSection={currentSection}
           />
         </>
       )}

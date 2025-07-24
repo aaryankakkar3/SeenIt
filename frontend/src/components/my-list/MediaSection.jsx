@@ -1,22 +1,53 @@
 import { useEffect } from "react";
 import Card from "./Card";
 import { useAnimeBackendStore } from "../../store/anime.backend.store";
+import { useMangaStore } from "../../store/manga.store";
+import { useShowsStore } from "../../store/shows.store";
+import { useComicsStore } from "../../store/comics.store";
 import { useAnimeExternalStore } from "../../store/anime.external.store";
 import { useSectionsStore } from "../../store/sections.store";
 import { MEDIA_TYPES } from "../../lib/mediaConfig";
 
 function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
-  const { entries, getAnimes } = useAnimeBackendStore();
+  // Get the appropriate store based on section type
+  const getStoreForSection = (section) => {
+    switch (section) {
+      case "animes":
+        return useAnimeBackendStore();
+      case "mangas":
+        return useMangaStore();
+      case "shows":
+        return useShowsStore();
+      case "comics":
+        return useComicsStore();
+      default:
+        return useAnimeBackendStore();
+    }
+  };
+
+  const {
+    entries,
+    getAnimes,
+    getEntries,
+    incrementEpisodes,
+    decrementEpisodes,
+    incrementProgress,
+    decrementProgress,
+  } = getStoreForSection(thisSection);
   const { clearQueryResults } = useAnimeExternalStore();
   const { deleteSection } = useSectionsStore();
 
   // Get media configuration for this section
-  const mediaConfig = MEDIA_TYPES[thisSection] || MEDIA_TYPES.anime;
+  const mediaConfig = MEDIA_TYPES[thisSection] || MEDIA_TYPES.animes;
 
-  // Fetch anime entries when component mounts
+  // Fetch entries when component mounts
   useEffect(() => {
-    getAnimes();
-  }, [getAnimes]);
+    if (thisSection === "animes") {
+      getAnimes();
+    } else {
+      getEntries();
+    }
+  }, [thisSection, getAnimes, getEntries]);
 
   const handleAddMedia = () => {
     onOpenSearchModal(thisSection);
@@ -31,6 +62,11 @@ function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
     ) {
       deleteSection(thisSection);
     }
+  };
+
+  // Create a modified onEdit function that includes the section type
+  const handleEdit = (entry) => {
+    onEdit(entry, thisSection);
   };
 
   return (
@@ -63,8 +99,14 @@ function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
           <Card
             key={idx}
             entry={entry}
-            onEdit={onEdit}
+            onEdit={handleEdit}
             mediaConfig={mediaConfig}
+            onIncrement={
+              thisSection === "animes" ? incrementEpisodes : incrementProgress
+            }
+            onDecrement={
+              thisSection === "animes" ? decrementEpisodes : decrementProgress
+            }
           />
         ))}
       </div>

@@ -1,8 +1,14 @@
 import { Plus, Minus, Star } from "lucide-react";
-import { useAnimeBackendStore } from "../../store/anime.backend.store";
 
-export default function Card({ entry, onEdit, mediaConfig }) {
-  const { incrementEpisodes, decrementEpisodes } = useAnimeBackendStore();
+export default function Card({
+  entry,
+  onEdit,
+  mediaConfig,
+  onIncrement,
+  onDecrement,
+}) {
+  // Remove the store import since we're using passed functions
+  // const { incrementEpisodes, decrementEpisodes } = useAnimeBackendStore();
 
   const {
     _id,
@@ -91,13 +97,13 @@ export default function Card({ entry, onEdit, mediaConfig }) {
             </div>
             <div className="flex flex-row gap-[4px]">
               <button
-                onClick={() => incrementEpisodes(_id)}
+                onClick={() => onIncrement(_id)}
                 className="text-textmuted border border-gray-500 w-[24px] h-[24px] flex justify-center items-center cursor-pointer hover:bg-textmuted hover:text-medium"
               >
                 <Plus size={16} />
               </button>
               <button
-                onClick={() => decrementEpisodes(_id)}
+                onClick={() => onDecrement(_id)}
                 className="text-textmuted border border-gray-500 w-[24px] h-[24px] flex justify-center items-center cursor-pointer hover:bg-textmuted hover:text-medium"
               >
                 <Minus size={16} />

@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { useAnimeBackendStore } from "../../store/anime.backend.store";
+import { useMangaStore } from "../../store/manga.store";
+import { useShowsStore } from "../../store/shows.store";
+import { useComicsStore } from "../../store/comics.store";
 import { useAnimeExternalStore } from "../../store/anime.external.store";
+import { MEDIA_TYPES } from "../../lib/mediaConfig";
 import { toast } from "react-hot-toast";
 
 export default function EditAnimeModal({
@@ -10,12 +14,61 @@ export default function EditAnimeModal({
   editingEntry,
   selectedQueryResult,
   onCloseAll,
+  currentSection,
 }) {
   const [selectedStatus, setSelectedStatus] = useState("Planned");
   const [rating, setRating] = useState(0);
   const [watchedEp, setWatchedEp] = useState("");
-  const { createAnime, editAnime, deleteAnime } = useAnimeBackendStore();
+
+  // Get the appropriate store functions based on current section
+  const animeStore = useAnimeBackendStore();
+  const mangaStore = useMangaStore();
+  const showsStore = useShowsStore();
+  const comicsStore = useComicsStore();
+
+  // Get the correct store and functions based on section
+  const getStoreFunctions = (section) => {
+    switch (section) {
+      case "animes":
+        return {
+          createEntry: animeStore.createAnime,
+          editEntry: animeStore.editAnime,
+          deleteEntry: animeStore.deleteAnime,
+        };
+      case "mangas":
+        return {
+          createEntry: mangaStore.createEntry,
+          editEntry: mangaStore.editEntry,
+          deleteEntry: mangaStore.deleteEntry,
+        };
+      case "shows":
+        return {
+          createEntry: showsStore.createEntry,
+          editEntry: showsStore.editEntry,
+          deleteEntry: showsStore.deleteEntry,
+        };
+      case "comics":
+        return {
+          createEntry: comicsStore.createEntry,
+          editEntry: comicsStore.editEntry,
+          deleteEntry: comicsStore.deleteEntry,
+        };
+      default:
+        return {
+          createEntry: animeStore.createAnime,
+          editEntry: animeStore.editAnime,
+          deleteEntry: animeStore.deleteAnime,
+        };
+    }
+  };
+
+  const { createEntry, editEntry, deleteEntry } =
+    getStoreFunctions(currentSection);
+
   const { clearQueryResults } = useAnimeExternalStore();
+
+  // Get media configuration for current section
+  const mediaConfig = MEDIA_TYPES[currentSection] || MEDIA_TYPES.animes;
 
   const statusOptions = ["Planned", "Active", "Completed", "Dropped"];
 
@@ -24,21 +77,42 @@ export default function EditAnimeModal({
   const modalData = isEditing ? editingEntry : selectedQueryResult;
 
   // Destructure the selected query result or editing entry
-  const { title, year, imageUrl, episodesTotal, animeStatus } = modalData || {};
+  const {
+    title,
+    year,
+    imageUrl,
+    episodesTotal,
+    chaptersTotal,
+    issuesTotal,
+    animeStatus,
+    mangaStatus,
+    showStatus,
+    comicStatus,
+  } = modalData || {};
+
+  // Get the correct values based on media type
+  const totalCount =
+    modalData?.[mediaConfig.releasedField] || episodesTotal || 0;
+  const mediaStatus =
+    modalData?.[mediaConfig.statusField] || animeStatus || "Unknown";
 
   // Pre-fill form when editing existing entry
   useEffect(() => {
     if (isEditing && editingEntry) {
       setSelectedStatus(editingEntry.yourStatus || "Planned");
-      setWatchedEp(editingEntry.episodesWatched?.toString() || "");
+      const watchedValue =
+        editingEntry[mediaConfig.watchedField] ||
+        editingEntry.episodesWatched ||
+        0;
+      setWatchedEp(watchedValue.toString());
       setRating(editingEntry.rating?.toString() || "0");
     } else {
-      // Reset form for new anime
+      // Reset form for new entry
       setSelectedStatus("Planned");
       setWatchedEp("");
       setRating("0");
     }
-  }, [isEditing, editingEntry, isOpen, selectedQueryResult]);
+  }, [isEditing, editingEntry, isOpen, selectedQueryResult, mediaConfig]);
 
   // Frontend validation
   const validateInput = () => {
@@ -47,12 +121,14 @@ export default function EditAnimeModal({
     const errors = [];
 
     if (watchedEpNum < 0) {
-      errors.push("Episodes watched cannot be negative");
+      errors.push(`${mediaConfig.watchedLabel} cannot be negative`);
     }
 
-    if (episodesTotal > 0 && watchedEpNum > episodesTotal) {
+    if (totalCount > 0 && watchedEpNum > totalCount) {
       errors.push(
-        `Episodes watched cannot exceed total episodes (${episodesTotal})`
+        `${
+          mediaConfig.watchedLabel
+        } cannot exceed total ${mediaConfig.releasedLabel.toLowerCase()} (${totalCount})`
       );
     }
 
@@ -72,12 +148,12 @@ export default function EditAnimeModal({
       // Auto-complete logic
       const watchedNum = parseInt(value) || 0;
       if (
-        episodesTotal > 0 &&
-        watchedNum >= episodesTotal &&
+        totalCount > 0 &&
+        watchedNum >= totalCount &&
         selectedStatus !== "Completed"
       ) {
         setSelectedStatus("Completed");
-        setWatchedEp(episodesTotal.toString());
+        setWatchedEp(totalCount.toString());
       }
     }
   };
@@ -107,33 +183,33 @@ export default function EditAnimeModal({
     }
 
     try {
-      const animeData = {
+      const mediaData = {
         ...modalData,
         yourStatus: selectedStatus,
-        episodesWatched: parseInt(watchedEp) || 0,
+        [mediaConfig.watchedField]: parseInt(watchedEp) || 0,
         rating: parseFloat(rating) || 0,
       };
 
       if (isEditing) {
-        await editAnime(editingEntry._id, animeData);
+        await editEntry(editingEntry._id, mediaData);
       } else {
-        await createAnime(animeData);
-        // Clear search results and reset form when adding new anime
+        await createEntry(mediaData);
+        // Clear search results and reset form when adding new entry
         clearQueryResults();
       }
 
       onCloseAll();
     } catch (error) {
-      console.error("Error saving anime:", error);
-      toast.error("Failed to save anime.");
+      console.error(`Error saving ${mediaConfig.name.toLowerCase()}:`, error);
+      toast.error(`Failed to save ${mediaConfig.name.toLowerCase()}.`);
     }
   };
 
   // Handle status change with auto-fill episodes
   const handleStatusChange = (status) => {
     setSelectedStatus(status);
-    if (status === "Completed" && episodesTotal > 0) {
-      setWatchedEp(episodesTotal.toString());
+    if (status === "Completed" && totalCount > 0) {
+      setWatchedEp(totalCount.toString());
     }
   };
 
@@ -148,7 +224,9 @@ export default function EditAnimeModal({
       <div className="relative z-60 w-[884px] h-[580px] bg-medium flex flex-col p-[64px] gap-[32px]">
         <div className="flex flex-row justify-between">
           <div className="text-h2 text-text">
-            {isEditing ? "Edit Anime" : "Add New Anime"}
+            {isEditing
+              ? `Edit ${mediaConfig.name}`
+              : `Add New ${mediaConfig.name}`}
           </div>
           <X
             className="text-textmuted w-[20px] h-[20px] cursor-pointer hover:text-text"
@@ -175,7 +253,7 @@ export default function EditAnimeModal({
                 <div className="flex flex-col gap-[6px] w-full">
                   <div className="font-semibold">Status</div>
                   <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
-                    {animeStatus || "Unknown"}
+                    {mediaStatus}
                   </div>
                 </div>
               </div>
@@ -203,13 +281,17 @@ export default function EditAnimeModal({
 
               <div className="flex flex-row gap-[12px] w-full">
                 <div className="flex flex-col gap-[6px] w-full">
-                  <div className="font-semibold">Released Ep</div>
+                  <div className="font-semibold">
+                    Released {mediaConfig.releasedLabel}
+                  </div>
                   <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
-                    {episodesTotal || "Unknown"}
+                    {totalCount || "Unknown"}
                   </div>
                 </div>
                 <div className="flex flex-col gap-[6px] w-full text-text">
-                  <div className="font-semibold">Watched Ep</div>
+                  <div className="font-semibold">
+                    {mediaConfig.watchedLabel}
+                  </div>
                   <div className="w-full h-[40px] bg-light px-[12px]">
                     <input
                       autoComplete="off"
@@ -219,8 +301,8 @@ export default function EditAnimeModal({
                       onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                       id="episodesWatched"
                       min="0"
-                      max={episodesTotal > 0 ? episodesTotal : undefined}
-                      placeholder={`0 - ${episodesTotal || "?"}`}
+                      max={totalCount > 0 ? totalCount : undefined}
+                      placeholder={`0 - ${totalCount || "?"}`}
                       className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
@@ -250,7 +332,9 @@ export default function EditAnimeModal({
                 onClick={handleSubmit}
                 className="bg-primary w-full h-[40px] text-dark hover:opacity-90 font-semibold flex justify-center items-center cursor-pointer"
               >
-                {isEditing ? "Update Anime" : "Add Anime"}
+                {isEditing
+                  ? `Update ${mediaConfig.name}`
+                  : mediaConfig.addButtonText}
               </button>
 
               {isEditing && (
@@ -258,21 +342,26 @@ export default function EditAnimeModal({
                   onClick={async () => {
                     if (
                       window.confirm(
-                        "Are you sure you want to delete this anime?"
+                        `Are you sure you want to delete this ${mediaConfig.name.toLowerCase()}?`
                       )
                     ) {
                       try {
-                        await deleteAnime(editingEntry._id);
+                        await deleteEntry(editingEntry._id);
                         onCloseAll();
                       } catch (error) {
-                        console.error("Error deleting anime:", error);
-                        toast.error("Failed to delete anime.");
+                        console.error(
+                          `Error deleting ${mediaConfig.name.toLowerCase()}:`,
+                          error
+                        );
+                        toast.error(
+                          `Failed to delete ${mediaConfig.name.toLowerCase()}.`
+                        );
                       }
                     }
                   }}
                   className="bg-red-600 w-full h-[40px] text-white font-semibold flex justify-center items-center cursor-pointer hover:opacity-90"
                 >
-                  Delete Anime
+                  Delete {mediaConfig.name}
                 </button>
               )}
 

@@ -4,6 +4,9 @@ import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import animeRoutes from "./routes/anime.route.js";
+import mangaRoutes from "./routes/manga.route.js";
+import showRoutes from "./routes/show.route.js";
+import comicRoutes from "./routes/comic.route.js";
 import authRoutes from "./routes/auth.route.js";
 import sectionsRoutes from "./routes/sections.route.js";
 
@@ -22,6 +25,9 @@ app.use(
 );
 
 app.use("/api/anime", animeRoutes);
+app.use("/api/manga", mangaRoutes);
+app.use("/api/shows", showRoutes);
+app.use("/api/comics", comicRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/sections", sectionsRoutes);
 
