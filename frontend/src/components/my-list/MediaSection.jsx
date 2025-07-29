@@ -25,15 +25,8 @@ function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
     }
   };
 
-  const {
-    entries,
-    getAnimes,
-    getEntries,
-    incrementEpisodes,
-    decrementEpisodes,
-    incrementProgress,
-    decrementProgress,
-  } = getStoreForSection(thisSection);
+  const { entries, getEntries, incrementProgress, decrementProgress } =
+    getStoreForSection(thisSection);
   const { clearQueryResults } = useAnimeExternalStore();
   const { deleteSection } = useSectionsStore();
 
@@ -42,12 +35,8 @@ function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
 
   // Fetch entries when component mounts
   useEffect(() => {
-    if (thisSection === "animes") {
-      getAnimes();
-    } else {
-      getEntries();
-    }
-  }, [thisSection, getAnimes, getEntries]);
+    getEntries();
+  }, [thisSection, getEntries]);
 
   const handleAddMedia = () => {
     onOpenSearchModal(thisSection);
@@ -101,12 +90,8 @@ function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
             entry={entry}
             onEdit={handleEdit}
             mediaConfig={mediaConfig}
-            onIncrement={
-              thisSection === "animes" ? incrementEpisodes : incrementProgress
-            }
-            onDecrement={
-              thisSection === "animes" ? decrementEpisodes : decrementProgress
-            }
+            onIncrement={incrementProgress}
+            onDecrement={decrementProgress}
           />
         ))}
       </div>

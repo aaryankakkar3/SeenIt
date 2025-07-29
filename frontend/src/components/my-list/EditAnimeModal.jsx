@@ -31,9 +31,9 @@ export default function EditAnimeModal({
     switch (section) {
       case "animes":
         return {
-          createEntry: animeStore.createAnime,
-          editEntry: animeStore.editAnime,
-          deleteEntry: animeStore.deleteAnime,
+          createEntry: animeStore.createEntry,
+          editEntry: animeStore.editEntry,
+          deleteEntry: animeStore.deleteEntry,
         };
       case "mangas":
         return {
@@ -55,9 +55,9 @@ export default function EditAnimeModal({
         };
       default:
         return {
-          createEntry: animeStore.createAnime,
-          editEntry: animeStore.editAnime,
-          deleteEntry: animeStore.deleteAnime,
+          createEntry: animeStore.createEntry,
+          editEntry: animeStore.editEntry,
+          deleteEntry: animeStore.deleteEntry,
         };
     }
   };

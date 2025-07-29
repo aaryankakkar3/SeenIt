@@ -1,11 +1,12 @@
 import { toast } from "react-hot-toast";
 import { create } from "zustand";
+import { axiosInstance } from "../lib/axios";
 
 export const useAnimeExternalStore = create((set) => ({
   queryResults: [],
   isSearching: false,
 
-  getQueryResults: async (query) => {
+  getQueryResults: async (query, type = "anime") => {
     if (!query || query.trim() === "") {
       set({ queryResults: [] });
       return;
@@ -14,25 +15,19 @@ export const useAnimeExternalStore = create((set) => ({
     set({ isSearching: true });
 
     try {
-      const response = await fetch(
-        `https://api.jikan.moe/v4/anime?q=${query}&limit=10`
+      const response = await axiosInstance.get(
+        `/external/${type}/${encodeURIComponent(query)}`
       );
-      const data = await response.json();
+      const data = response.data;
 
-      const filteredResults = data.data.map((anime) => ({
-        title: anime.title,
-        year: anime.year || anime.aired?.prop?.from?.year || "Unknown",
-        imageUrl: anime.images?.jpg?.image_url,
-        jikanId: anime.mal_id,
-        episodesTotal: anime.episodes || 0,
-        animeStatus: anime.status || "Unknown",
-      }));
+      // The external API already returns transformed data, so we can use it directly
+      const filteredResults = data.data || [];
 
       set({ queryResults: filteredResults, isSearching: false });
       console.log("Query results:", filteredResults);
     } catch (error) {
       toast.error("Failed to fetch entries.");
-      console.error("Error in fetching from external database.:", error);
+      console.error("Error in fetching from backend.:", error);
       set({ isSearching: false });
     }
   },

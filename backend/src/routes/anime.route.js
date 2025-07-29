@@ -22,6 +22,8 @@ router.delete("/:id", protectRoute, deleteEntry);
 
 router.put("/:id", protectRoute, updateEntry);
 
-router.patch("/:id/increment", protectRoute, incrementWatchedEpisodes);
+// PUT /api/anime/:id/increment - Increment episodes watched
+router.put("/:id/increment", protectRoute, incrementWatchedEpisodes);
 
-router.patch("/:id/decrement", protectRoute, decrementWatchedEpisodes);
+// PUT /api/anime/:id/decrement - Decrement episodes watched
+router.put("/:id/decrement", protectRoute, decrementWatchedEpisodes);
