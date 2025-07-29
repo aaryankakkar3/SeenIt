@@ -2,7 +2,7 @@ import { toast } from "react-hot-toast";
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 
-export const useAnimeExternalStore = create((set) => ({
+export const useExternalStore = create((set) => ({
   queryResults: [],
   isSearching: false,
 

@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
-import { useAnimeExternalStore } from "../../store/anime.external.store";
-import { useAnimeBackendStore } from "../../store/anime.backend.store";
+import { useExternalStore } from "../../store/external.store";
+import { useAnimeStore } from "../../store/anime.store";
 import QueryItem from "./QueryItem";
 
 export default function SearchModal({ isOpen, onClose, onSelectResult }) {
   const [searchQuery, setSearchQuery] = useState("");
   const { queryResults, isSearching, getQueryResults, clearQueryResults } =
-    useAnimeExternalStore();
-  const { entries } = useAnimeBackendStore();
+    useExternalStore();
+  const { entries } = useAnimeStore();
 
   // Clear search query and results when modal opens
   useEffect(() => {

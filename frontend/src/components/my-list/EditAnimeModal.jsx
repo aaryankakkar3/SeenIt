@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { useAnimeBackendStore } from "../../store/anime.backend.store";
+import { useAnimeStore } from "../../store/anime.store";
 import { useMangaStore } from "../../store/manga.store";
 import { useShowsStore } from "../../store/shows.store";
 import { useComicsStore } from "../../store/comics.store";
-import { useAnimeExternalStore } from "../../store/anime.external.store";
+import { useExternalStore } from "../../store/external.store";
 import { MEDIA_TYPES } from "../../lib/mediaConfig";
 import { toast } from "react-hot-toast";
 
@@ -21,7 +21,7 @@ export default function EditAnimeModal({
   const [watchedEp, setWatchedEp] = useState("");
 
   // Get the appropriate store functions based on current section
-  const animeStore = useAnimeBackendStore();
+  const animeStore = useAnimeStore();
   const mangaStore = useMangaStore();
   const showsStore = useShowsStore();
   const comicsStore = useComicsStore();
@@ -65,7 +65,7 @@ export default function EditAnimeModal({
   const { createEntry, editEntry, deleteEntry } =
     getStoreFunctions(currentSection);
 
-  const { clearQueryResults } = useAnimeExternalStore();
+  const { clearQueryResults } = useExternalStore();
 
   // Get media configuration for current section
   const mediaConfig = MEDIA_TYPES[currentSection] || MEDIA_TYPES.animes;

@@ -1,19 +1,18 @@
 import { useEffect } from "react";
 import Card from "./Card";
-import { useAnimeBackendStore } from "../../store/anime.backend.store";
+import { useAnimeStore } from "../../store/anime.store";
 import { useMangaStore } from "../../store/manga.store";
 import { useShowsStore } from "../../store/shows.store";
 import { useComicsStore } from "../../store/comics.store";
-import { useAnimeExternalStore } from "../../store/anime.external.store";
+import { useExternalStore } from "../../store/external.store";
 import { useSectionsStore } from "../../store/sections.store";
 import { MEDIA_TYPES } from "../../lib/mediaConfig";
-
 function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
   // Get the appropriate store based on section type
   const getStoreForSection = (section) => {
     switch (section) {
       case "animes":
-        return useAnimeBackendStore();
+        return useAnimeStore();
       case "mangas":
         return useMangaStore();
       case "shows":
@@ -21,13 +20,13 @@ function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
       case "comics":
         return useComicsStore();
       default:
-        return useAnimeBackendStore();
+        return useAnimeStore();
     }
   };
 
   const { entries, getEntries, incrementProgress, decrementProgress } =
     getStoreForSection(thisSection);
-  const { clearQueryResults } = useAnimeExternalStore();
+  const { clearQueryResults } = useExternalStore();
   const { deleteSection } = useSectionsStore();
 
   // Get media configuration for this section
