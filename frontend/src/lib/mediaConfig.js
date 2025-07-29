@@ -2,6 +2,7 @@
 export const MEDIA_TYPES = {
   animes: {
     name: "Anime",
+    displayName: "Anime",
     statusField: "animeStatus",
     releasedField: "episodesTotal",
     watchedField: "episodesWatched",
@@ -12,6 +13,7 @@ export const MEDIA_TYPES = {
   },
   mangas: {
     name: "Manga",
+    displayName: "Manga",
     statusField: "mangaStatus",
     releasedField: "chaptersTotal",
     watchedField: "chaptersRead",
@@ -22,6 +24,7 @@ export const MEDIA_TYPES = {
   },
   shows: {
     name: "TV Shows",
+    displayName: "Shows",
     statusField: "showStatus",
     releasedField: "episodesTotal",
     watchedField: "episodesWatched",
@@ -32,6 +35,7 @@ export const MEDIA_TYPES = {
   },
   comics: {
     name: "Comics",
+    displayName: "Comics",
     statusField: "comicStatus",
     releasedField: "issuesTotal",
     watchedField: "issuesRead",

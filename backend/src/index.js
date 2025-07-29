@@ -9,6 +9,7 @@ import showRoutes from "./routes/show.route.js";
 import comicRoutes from "./routes/comic.route.js";
 import authRoutes from "./routes/auth.route.js";
 import sectionsRoutes from "./routes/sections.route.js";
+import externalQueryRoutes from "./routes/externalQuery.route.js";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use("/api/shows", showRoutes);
 app.use("/api/comics", comicRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/sections", sectionsRoutes);
+app.use("/api/external", externalQueryRoutes);
 
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);

@@ -333,7 +333,7 @@ export default function EditAnimeModal({
                 className="bg-primary w-full h-[40px] text-dark hover:opacity-90 font-semibold flex justify-center items-center cursor-pointer"
               >
                 {isEditing
-                  ? `Update ${mediaConfig.name}`
+                  ? `Update ${mediaConfig.displayName}`
                   : mediaConfig.addButtonText}
               </button>
 
@@ -361,7 +361,7 @@ export default function EditAnimeModal({
                   }}
                   className="bg-red-600 w-full h-[40px] text-white font-semibold flex justify-center items-center cursor-pointer hover:opacity-90"
                 >
-                  Delete {mediaConfig.name}
+                  Delete {mediaConfig.displayName}
                 </button>
               )}
 

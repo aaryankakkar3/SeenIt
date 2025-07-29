@@ -6,9 +6,17 @@ import QueryItem from "./QueryItem";
 
 export default function SearchModal({ isOpen, onClose, onSelectResult }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const { queryResults, isSearching, getQueryResults } =
+  const { queryResults, isSearching, getQueryResults, clearQueryResults } =
     useAnimeExternalStore();
   const { entries } = useAnimeBackendStore();
+
+  // Clear search query and results when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setSearchQuery("");
+      clearQueryResults();
+    }
+  }, [isOpen, clearQueryResults]);
 
   // Get user anime IDs from entries
   const userAnimeIds = entries.map((entry) => entry.jikanId);
