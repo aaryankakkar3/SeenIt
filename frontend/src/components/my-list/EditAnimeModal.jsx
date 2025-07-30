@@ -293,6 +293,84 @@ export default function EditAnimeModal({
 
   if (!isOpen || !modalData) return null;
 
+  function YearBox() {
+    <div className="flex flex-col gap-[6px] w-full">
+      <div className="font-semibold">Year</div>
+      <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
+        {year || "Unknown"}
+      </div>
+    </div>;
+  }
+
+  function StatusBox() {
+    return (
+      <div className="flex flex-col gap-[6px] w-full">
+        <div className="font-semibold">Status</div>
+        <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
+          {mediaStatus}
+        </div>
+      </div>
+    );
+  }
+
+  function ReleasedBox() {
+    return (
+      <div className="flex flex-col gap-[6px] w-full">
+        <div className="font-semibold">
+          Released {mediaConfig.releasedLabel}
+        </div>
+        <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
+          {totalCount || "Unknown"}
+        </div>
+      </div>
+    );
+  }
+
+  function TotalBox() {
+    return (
+      <div className="flex flex-col gap-[6px] w-full text-text">
+        <div className="font-semibold">{mediaConfig.consumedLabel}</div>
+        <div className="w-full h-[40px] bg-light px-[12px]">
+          <input
+            autoComplete="off"
+            type="number"
+            value={watchedEp}
+            onChange={handleEpisodesWatchedChange}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            id="episodesWatched"
+            min="0"
+            max={totalCount > 0 ? totalCount : undefined}
+            placeholder={`0 - ${totalCount || "?"}`}
+            className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  function RatingBox() {
+    return (
+      <div className="flex flex-col gap-[6px] w-full text-text">
+        <div className="font-semibold">Rating</div>
+        <div className="w-full h-[40px] bg-light px-[12px]">
+          <input
+            autoComplete="off"
+            type="number"
+            id="rating"
+            onChange={handleRatingChange}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            value={rating}
+            min="0"
+            max="5"
+            step="0.1"
+            placeholder="0 - 5"
+            className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
@@ -322,20 +400,11 @@ export default function EditAnimeModal({
                 </div>
               </div>
               <div className="flex flex-row gap-[12px] w-full">
-                <div className="flex flex-col gap-[6px] w-full">
-                  <div className="font-semibold">Year</div>
-                  <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
-                    {year || "Unknown"}
-                  </div>
-                </div>
-                <div className="flex flex-col gap-[6px] w-full">
-                  <div className="font-semibold">Status</div>
-                  <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
-                    {mediaStatus}
-                  </div>
-                </div>
+                <YearBox />
+                <StatusBox />
               </div>
 
+              {/* Your Status Bar */}
               <div className="flex flex-row gap-[12px] w-full">
                 <div className="flex flex-col gap-[6px] w-full text-text">
                   <div className="font-semibold">Your Status</div>
@@ -358,51 +427,9 @@ export default function EditAnimeModal({
               </div>
 
               <div className="flex flex-row gap-[12px] w-full">
-                <div className="flex flex-col gap-[6px] w-full">
-                  <div className="font-semibold">
-                    Released {mediaConfig.releasedLabel}
-                  </div>
-                  <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
-                    {totalCount || "Unknown"}
-                  </div>
-                </div>
-                <div className="flex flex-col gap-[6px] w-full text-text">
-                  <div className="font-semibold">
-                    {mediaConfig.consumedLabel}
-                  </div>
-                  <div className="w-full h-[40px] bg-light px-[12px]">
-                    <input
-                      autoComplete="off"
-                      type="number"
-                      value={watchedEp}
-                      onChange={handleEpisodesWatchedChange}
-                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                      id="episodesWatched"
-                      min="0"
-                      max={totalCount > 0 ? totalCount : undefined}
-                      placeholder={`0 - ${totalCount || "?"}`}
-                      className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-[6px] w-full text-text">
-                  <div className="font-semibold">Rating</div>
-                  <div className="w-full h-[40px] bg-light px-[12px]">
-                    <input
-                      autoComplete="off"
-                      type="number"
-                      id="rating"
-                      onChange={handleRatingChange}
-                      onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                      value={rating}
-                      min="0"
-                      max="5"
-                      step="0.1"
-                      placeholder="0 - 5"
-                      className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                  </div>
-                </div>
+                <ReleasedBox />
+                <TotalBox />
+                <RatingBox />
               </div>
             </div>
             <div className="w-full h-[40px] flex flex-row gap-[12px]">
