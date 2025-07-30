@@ -20,11 +20,11 @@ const mangaCacheSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    chaptersTotal: {
+    released: {
       type: Number,
       default: 0,
     },
-    mangaStatus: {
+    status: {
       type: String,
       default: "Unknown",
     },

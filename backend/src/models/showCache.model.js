@@ -20,11 +20,11 @@ const showCacheSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    episodesTotal: {
+    released: {
       type: Number,
       default: 0,
     },
-    showStatus: {
+    status: {
       type: String,
       default: "Unknown",
     },

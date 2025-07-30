@@ -19,6 +19,7 @@ export default function EditAnimeModal({
   const [selectedStatus, setSelectedStatus] = useState("Planned");
   const [rating, setRating] = useState(0);
   const [watchedEp, setWatchedEp] = useState("");
+  const [enhancedData, setEnhancedData] = useState(null);
 
   // Get the appropriate store functions based on current section
   const animeStore = useAnimeStore();
@@ -34,30 +35,35 @@ export default function EditAnimeModal({
           createEntry: animeStore.createEntry,
           editEntry: animeStore.editEntry,
           deleteEntry: animeStore.deleteEntry,
+          preFetchCache: animeStore.preFetchCache,
         };
       case "mangas":
         return {
           createEntry: mangaStore.createEntry,
           editEntry: mangaStore.editEntry,
           deleteEntry: mangaStore.deleteEntry,
+          preFetchCache: mangaStore.preFetchCache,
         };
       case "shows":
         return {
           createEntry: showsStore.createEntry,
           editEntry: showsStore.editEntry,
           deleteEntry: showsStore.deleteEntry,
+          preFetchCache: showsStore.preFetchCache,
         };
       case "comics":
         return {
           createEntry: comicsStore.createEntry,
           editEntry: comicsStore.editEntry,
           deleteEntry: comicsStore.deleteEntry,
+          preFetchCache: comicsStore.preFetchCache,
         };
       default:
         return {
           createEntry: animeStore.createEntry,
           editEntry: animeStore.editEntry,
           deleteEntry: animeStore.deleteEntry,
+          preFetchCache: animeStore.preFetchCache,
         };
     }
   };
@@ -74,13 +80,18 @@ export default function EditAnimeModal({
 
   // Determine if we're editing an existing entry or adding a new one
   const isEditing = editingEntry !== null;
-  const modalData = isEditing ? editingEntry : selectedQueryResult;
+  const modalData = isEditing
+    ? editingEntry
+    : enhancedData || selectedQueryResult;
 
   // Destructure the selected query result or editing entry
   const {
     title,
     year,
     imageUrl,
+    released,
+    status,
+    // Legacy field names for backward compatibility
     episodesTotal,
     chaptersTotal,
     issuesTotal,
@@ -90,17 +101,26 @@ export default function EditAnimeModal({
     comicStatus,
   } = modalData || {};
 
-  // Get the correct values based on media type
+  // Get the correct values based on media type (check new standardized fields first)
   const totalCount =
-    modalData?.[mediaConfig.releasedField] || episodesTotal || 0;
+    modalData?.released ||
+    modalData?.[mediaConfig.releasedField] ||
+    episodesTotal ||
+    0;
   const mediaStatus =
-    modalData?.[mediaConfig.statusField] || animeStatus || "Unknown";
+    modalData?.status ||
+    modalData?.[mediaConfig.statusField] ||
+    animeStatus ||
+    "Unknown";
 
   // Pre-fill form when editing existing entry
   useEffect(() => {
     if (isEditing && editingEntry) {
       setSelectedStatus(editingEntry.yourStatus || "Planned");
+      // Check for standardized field first, then legacy field names
       const watchedValue =
+        editingEntry.consumed ||
+        editingEntry[mediaConfig.consumedField] ||
         editingEntry[mediaConfig.watchedField] ||
         editingEntry.episodesWatched ||
         0;
@@ -113,6 +133,64 @@ export default function EditAnimeModal({
       setRating("0");
     }
   }, [isEditing, editingEntry, isOpen, selectedQueryResult, mediaConfig]);
+
+  // Pre-fetch cache data for shows and comics when selectedQueryResult changes
+  useEffect(() => {
+    const preFetchCacheData = async () => {
+      // Only pre-fetch for shows and comics, and only when we have a selectedQueryResult (not editing)
+      if (
+        !isEditing &&
+        selectedQueryResult &&
+        (currentSection === "shows" || currentSection === "comics") &&
+        selectedQueryResult.jikanId
+      ) {
+        console.log(
+          "Pre-fetching cache data for:",
+          selectedQueryResult.jikanId,
+          "Section:",
+          currentSection
+        );
+        console.log("Selected query result:", selectedQueryResult);
+        const storeFunctions = getStoreFunctions(currentSection);
+        if (storeFunctions.preFetchCache) {
+          try {
+            const cachedData = await storeFunctions.preFetchCache(
+              selectedQueryResult.jikanId
+            );
+            console.log(
+              "Pre-fetch completed successfully, cached data:",
+              cachedData
+            );
+            if (cachedData) {
+              // Merge the cached data with the original selectedQueryResult
+              const enhanced = {
+                ...selectedQueryResult,
+                ...cachedData,
+              };
+              setEnhancedData(enhanced);
+              console.log("Enhanced data set:", enhanced);
+              console.log("Modal data will now be:", enhanced);
+            }
+          } catch (error) {
+            console.error("Pre-fetch failed:", error);
+          }
+        } else {
+          console.log("No preFetchCache function found");
+        }
+      } else {
+        console.log("Pre-fetch conditions not met:", {
+          isEditing,
+          hasSelectedResult: !!selectedQueryResult,
+          currentSection,
+          hasJikanId: selectedQueryResult?.jikanId,
+        });
+        // Reset enhanced data when not applicable
+        setEnhancedData(null);
+      }
+    };
+
+    preFetchCacheData();
+  }, [selectedQueryResult, currentSection, isEditing]);
 
   // Frontend validation
   const validateInput = () => {
@@ -186,7 +264,7 @@ export default function EditAnimeModal({
       const mediaData = {
         ...modalData,
         yourStatus: selectedStatus,
-        [mediaConfig.watchedField]: parseInt(watchedEp) || 0,
+        consumed: parseInt(watchedEp) || 0, // Use standardized field name
         rating: parseFloat(rating) || 0,
       };
 
@@ -290,7 +368,7 @@ export default function EditAnimeModal({
                 </div>
                 <div className="flex flex-col gap-[6px] w-full text-text">
                   <div className="font-semibold">
-                    {mediaConfig.watchedLabel}
+                    {mediaConfig.consumedLabel}
                   </div>
                   <div className="w-full h-[40px] bg-light px-[12px]">
                     <input

@@ -20,11 +20,11 @@ const animeCacheSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    episodesTotal: {
+    released: {
       type: Number,
       default: 0,
     },
-    animeStatus: {
+    status: {
       type: String,
       default: "Unknown",
     },

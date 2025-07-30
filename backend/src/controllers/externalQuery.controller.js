@@ -28,8 +28,8 @@ export const fetchData = async (req, res) => {
             imageUrl:
               anime.images?.jpg?.image_url || "https://placehold.co/90x129",
             jikanId: anime.mal_id,
-            episodesTotal: anime.episodes || 0,
-            animeStatus: anime.status || "Unknown",
+            released: anime.episodes || 0,
+            status: anime.status || "Unknown",
           })) || [];
         break;
 
@@ -48,8 +48,8 @@ export const fetchData = async (req, res) => {
             imageUrl:
               manga.images?.jpg?.image_url || "https://placehold.co/90x129",
             jikanId: manga.mal_id,
-            chaptersTotal: manga.chapters || 0,
-            mangaStatus: manga.status || "Unknown",
+            released: manga.chapters || 0,
+            status: manga.status || "Unknown",
           })) || [];
         break;
 
@@ -71,8 +71,8 @@ export const fetchData = async (req, res) => {
               ? `https://image.tmdb.org/t/p/w300${show.poster_path}`
               : "https://placehold.co/90x129",
             jikanId: show.id, // Using TMDB ID as jikanId for consistency
-            episodesTotal: 0, // Would need additional API call to get episode count
-            showStatus: show.status || "Unknown",
+            released: 0, // Would need additional API call to get episode count
+            status: show.status || "Unknown",
           })) || [];
         break;
 
@@ -85,14 +85,22 @@ export const fetchData = async (req, res) => {
         const comicsData = await comicsResponse.json();
 
         transformedResults =
-          comicsData.results?.map((comic) => ({
-            title: comic.name,
-            year: comic.start_year || "Unknown",
-            imageUrl: comic.image?.medium_url || "https://placehold.co/90x129",
-            jikanId: comic.id, // Using ComicVine ID as jikanId for consistency
-            issuesTotal: comic.count_of_issues || 0,
-            comicStatus: "Unknown", // ComicVine doesn't provide status in search
-          })) || [];
+          comicsData.results?.map((comic) => {
+            console.log(`[ExternalQuery] Comic from search:`, {
+              id: comic.id,
+              name: comic.name,
+              api_detail_url: comic.api_detail_url,
+            });
+            return {
+              title: comic.name,
+              year: comic.start_year || "Unknown",
+              imageUrl:
+                comic.image?.medium_url || "https://placehold.co/90x129",
+              jikanId: comic.id, // Using ComicVine ID as jikanId for consistency
+              released: comic.count_of_issues || 0,
+              status: "Unknown", // ComicVine doesn't provide status in search
+            };
+          }) || [];
         break;
 
       default:

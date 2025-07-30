@@ -76,10 +76,10 @@ export const createMediaStore = (mediaConfig) => {
             entry._id === entryId ? response.data.data : entry
           ),
         }));
-        toast.success(`${mediaConfig.watchedLabel} incremented`);
+        toast.success(`${mediaConfig.consumedLabel} incremented`);
       } catch (error) {
         toast.error(
-          `Failed to increment ${mediaConfig.watchedLabel.toLowerCase()}`
+          `Failed to increment ${mediaConfig.consumedLabel.toLowerCase()}`
         );
         console.error(
           `Error incrementing ${mediaConfig.name.toLowerCase()} progress:`,
@@ -98,10 +98,10 @@ export const createMediaStore = (mediaConfig) => {
             entry._id === entryId ? response.data.data : entry
           ),
         }));
-        toast.success(`${mediaConfig.watchedLabel} decremented`);
+        toast.success(`${mediaConfig.consumedLabel} decremented`);
       } catch (error) {
         toast.error(
-          `Failed to decrement ${mediaConfig.watchedLabel.toLowerCase()}`
+          `Failed to decrement ${mediaConfig.consumedLabel.toLowerCase()}`
         );
         console.error(
           `Error decrementing ${mediaConfig.name.toLowerCase()} progress:`,
@@ -123,6 +123,35 @@ export const createMediaStore = (mediaConfig) => {
           `Error deleting ${mediaConfig.name.toLowerCase()} entry:`,
           error
         );
+      }
+    },
+
+    preFetchCache: async (externalId) => {
+      try {
+        console.log(
+          `[${mediaConfig.name}Store] Pre-fetching cache for external ID:`,
+          externalId
+        );
+        console.log(
+          `[${mediaConfig.name}Store] API endpoint:`,
+          `${mediaConfig.apiEndpoint}/cache/${externalId}`
+        );
+        const response = await axiosInstance.get(
+          `${mediaConfig.apiEndpoint}/cache/${externalId}`
+        );
+        console.log(
+          `[${mediaConfig.name}Store] Pre-fetch response:`,
+          response.data
+        );
+        return response.data.data;
+      } catch (error) {
+        console.error(
+          `Error pre-fetching ${mediaConfig.name.toLowerCase()} cache:`,
+          error
+        );
+        console.error(`Error details:`, error.response?.data || error.message);
+        // Don't show toast for cache errors as this is a background operation
+        return null;
       }
     },
   }));

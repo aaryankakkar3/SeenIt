@@ -5,9 +5,9 @@ import ShowCache from "../models/showCache.model.js";
 
 const mediaConfig = {
   name: "TV Shows",
-  statusField: "showStatus",
-  releasedField: "episodesTotal",
-  watchedField: "episodesWatched",
+  statusField: "status",
+  releasedField: "released",
+  watchedField: "consumed",
   releasedLabel: "Episodes",
   watchedLabel: "Episodes Watched",
 };
@@ -21,6 +21,7 @@ const {
   deleteEntry,
   incrementProgress,
   decrementProgress,
+  preFetchCache,
 } = createMediaController(ShowEntry, ShowCache, getCachedMedia, mediaConfig);
 
 export {
@@ -30,4 +31,5 @@ export {
   deleteEntry,
   incrementProgress,
   decrementProgress,
+  preFetchCache,
 };

@@ -27,7 +27,7 @@ const mangaEntrySchema = new mongoose.Schema(
         message: "Rating must be between 0 and 5.",
       },
     },
-    chaptersRead: {
+    consumed: {
       type: Number,
       default: 0,
       min: [0, "Chapters read cannot be negative"],

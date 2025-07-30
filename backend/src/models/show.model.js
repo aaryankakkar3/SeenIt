@@ -27,7 +27,7 @@ const showEntrySchema = new mongoose.Schema(
         message: "Rating must be between 0 and 5.",
       },
     },
-    episodesWatched: {
+    consumed: {
       type: Number,
       default: 0,
       min: [0, "Episodes watched cannot be negative"],

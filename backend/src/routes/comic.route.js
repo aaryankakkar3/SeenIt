@@ -6,6 +6,7 @@ import {
   deleteEntry,
   incrementProgress,
   decrementProgress,
+  preFetchCache,
 } from "../controllers/comic.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
@@ -31,5 +32,8 @@ router.put("/:id/increment", incrementProgress);
 
 // PUT /api/comics/:id/decrement - Decrement issues read
 router.put("/:id/decrement", decrementProgress);
+
+// GET /api/comics/cache/:id - Pre-fetch cache data for a comic
+router.get("/cache/:id", preFetchCache);
 
 export default router;

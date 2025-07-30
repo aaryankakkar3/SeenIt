@@ -6,7 +6,7 @@ export const useExternalStore = create((set) => ({
   queryResults: [],
   isSearching: false,
 
-  getQueryResults: async (query, type = "anime") => {
+  getQueryResults: async (query, type) => {
     if (!query || query.trim() === "") {
       set({ queryResults: [] });
       return;
@@ -15,9 +15,10 @@ export const useExternalStore = create((set) => ({
     set({ isSearching: true });
 
     try {
-      const response = await axiosInstance.get(
-        `/external/${type}/${encodeURIComponent(query)}`
-      );
+      console.log("Fetching query results for:", query, "Type:", type);
+      const request = `/external/${type}/${encodeURIComponent(query)}`;
+      console.log("Request URL:", request);
+      const response = await axiosInstance.get(request);
       const data = response.data;
 
       // The external API already returns transformed data, so we can use it directly

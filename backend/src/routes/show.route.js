@@ -6,6 +6,7 @@ import {
   deleteEntry,
   incrementProgress,
   decrementProgress,
+  preFetchCache,
 } from "../controllers/show.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
@@ -31,5 +32,8 @@ router.put("/:id/increment", incrementProgress);
 
 // PUT /api/shows/:id/decrement - Decrement episodes watched
 router.put("/:id/decrement", decrementProgress);
+
+// GET /api/shows/cache/:id - Pre-fetch cache data for a show
+router.get("/cache/:id", preFetchCache);
 
 export default router;

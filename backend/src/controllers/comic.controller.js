@@ -5,9 +5,9 @@ import ComicCache from "../models/comicCache.model.js";
 
 const mediaConfig = {
   name: "Comics",
-  statusField: "comicStatus",
-  releasedField: "issuesTotal",
-  watchedField: "issuesRead",
+  statusField: "status",
+  releasedField: "released",
+  watchedField: "consumed",
   releasedLabel: "Issues",
   watchedLabel: "Issues Read",
 };
@@ -21,6 +21,7 @@ const {
   deleteEntry,
   incrementProgress,
   decrementProgress,
+  preFetchCache,
 } = createMediaController(ComicEntry, ComicCache, getCachedMedia, mediaConfig);
 
 export {
@@ -30,4 +31,5 @@ export {
   deleteEntry,
   incrementProgress,
   decrementProgress,
+  preFetchCache,
 };

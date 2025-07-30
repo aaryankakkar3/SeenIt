@@ -5,9 +5,9 @@ import MangaCache from "../models/mangaCache.model.js";
 
 const mediaConfig = {
   name: "Manga",
-  statusField: "mangaStatus",
-  releasedField: "chaptersTotal",
-  watchedField: "chaptersRead",
+  statusField: "status",
+  releasedField: "released",
+  watchedField: "consumed",
   releasedLabel: "Chapters",
   watchedLabel: "Chapters Read",
 };

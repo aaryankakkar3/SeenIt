@@ -27,7 +27,7 @@ const comicEntrySchema = new mongoose.Schema(
         message: "Rating must be between 0 and 5.",
       },
     },
-    issuesRead: {
+    consumed: {
       type: Number,
       default: 0,
       min: [0, "Issues read cannot be negative"],

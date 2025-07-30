@@ -20,11 +20,11 @@ const comicCacheSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    issuesTotal: {
+    released: {
       type: Number,
       default: 0,
     },
-    comicStatus: {
+    status: {
       type: String,
       default: "Unknown",
     },

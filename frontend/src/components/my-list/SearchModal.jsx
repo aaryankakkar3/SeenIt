@@ -2,13 +2,60 @@ import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { useExternalStore } from "../../store/external.store";
 import { useAnimeStore } from "../../store/anime.store";
+import { useMangaStore } from "../../store/manga.store";
+import { useShowsStore } from "../../store/shows.store";
+import { useComicsStore } from "../../store/comics.store";
+import { MEDIA_TYPES } from "../../lib/mediaConfig";
 import QueryItem from "./QueryItem";
 
-export default function SearchModal({ isOpen, onClose, onSelectResult }) {
+export default function SearchModal({
+  isOpen,
+  onClose,
+  onSelectResult,
+  mediaType = "animes",
+}) {
   const [searchQuery, setSearchQuery] = useState("");
   const { queryResults, isSearching, getQueryResults, clearQueryResults } =
     useExternalStore();
-  const { entries } = useAnimeStore();
+
+  // Get the appropriate store based on media type
+  const getStoreForMediaType = (type) => {
+    switch (type) {
+      case "animes":
+        return useAnimeStore();
+      case "mangas":
+        return useMangaStore();
+      case "shows":
+        return useShowsStore();
+      case "comics":
+        return useComicsStore();
+      default:
+        return useAnimeStore();
+    }
+  };
+
+  const { entries } = getStoreForMediaType(mediaType);
+
+  // Get media configuration
+  const mediaConfig = MEDIA_TYPES[mediaType] || MEDIA_TYPES.animes;
+
+  // Convert mediaType to API type based on backend expectations
+  const getApiType = (type) => {
+    switch (type) {
+      case "animes":
+        return "anime";
+      case "mangas":
+        return "manga";
+      case "shows":
+        return "shows";
+      case "comics":
+        return "comics";
+      default:
+        return "anime";
+    }
+  };
+
+  const apiType = getApiType(mediaType);
 
   // Clear search query and results when modal opens
   useEffect(() => {
@@ -18,12 +65,12 @@ export default function SearchModal({ isOpen, onClose, onSelectResult }) {
     }
   }, [isOpen, clearQueryResults]);
 
-  // Get user anime IDs from entries
-  const userAnimeIds = entries.map((entry) => entry.jikanId);
+  // Get user entry IDs from entries
+  const userEntryIds = entries.map((entry) => entry.jikanId);
 
-  // Filter out already added anime
+  // Filter out already added entries
   const filteredResults = queryResults.filter(
-    (result) => !userAnimeIds.includes(result.jikanId)
+    (result) => !userEntryIds.includes(result.jikanId)
   );
 
   if (!isOpen) return null;
@@ -39,7 +86,7 @@ export default function SearchModal({ isOpen, onClose, onSelectResult }) {
       {/* SearchModal Content */}
       <div className="relative z-20 w-[528px] h-[582px] bg-medium flex flex-col p-[64px] gap-[12px]">
         <div className="flex flex-row items-center justify-between">
-          <div className="text-h2 text-text">Add New Anime</div>
+          <div className="text-h2 text-text">Add New {mediaConfig.name}</div>
           <X
             className="text-textmuted w-[20px] h-[20px] cursor-pointer hover:text-text"
             onClick={onClose}
@@ -54,14 +101,14 @@ export default function SearchModal({ isOpen, onClose, onSelectResult }) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) =>
-                e.key === "Enter" && getQueryResults(searchQuery)
+                e.key === "Enter" && getQueryResults(searchQuery, apiType)
               }
-              placeholder="Search for anime"
+              placeholder={`Search for ${mediaConfig.name.toLowerCase()}`}
               className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
             />
           </div>
           <button
-            onClick={() => getQueryResults(searchQuery)}
+            onClick={() => getQueryResults(searchQuery, apiType)}
             disabled={isSearching}
             className="h-[32px] w-[78px] text-dark bg-primary hover:opacity-90 flex justify-center items-center font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >

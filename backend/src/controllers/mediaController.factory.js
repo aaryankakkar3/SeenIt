@@ -37,14 +37,13 @@ export const createMediaController = (
               jikanId: entry.jikanId,
               yourStatus: entry.yourStatus,
               rating: entry.rating,
-              [mediaConfig.watchedField]: entry[mediaConfig.watchedField],
+              consumed: entry.consumed,
               // Cached data
               title: cachedData.title,
               imageUrl: cachedData.imageUrl,
               year: cachedData.year,
-              [mediaConfig.releasedField]:
-                cachedData[mediaConfig.releasedField],
-              [mediaConfig.statusField]: cachedData[mediaConfig.statusField],
+              released: cachedData.released,
+              status: cachedData.status,
               createdAt: entry.createdAt,
               updatedAt: entry.updatedAt,
             };
@@ -62,13 +61,13 @@ export const createMediaController = (
               jikanId: entry.jikanId,
               yourStatus: entry.yourStatus,
               rating: entry.rating,
-              [mediaConfig.watchedField]: entry[mediaConfig.watchedField],
+              consumed: entry.consumed,
               // Fallback data
               title: "Unknown Title",
               imageUrl: "https://placehold.co/90x129",
               year: 0,
-              [mediaConfig.releasedField]: 0,
-              [mediaConfig.statusField]: "Unknown",
+              released: 0,
+              status: "Unknown",
               createdAt: entry.createdAt,
               updatedAt: entry.updatedAt,
             };
@@ -152,12 +151,12 @@ export const createMediaController = (
         jikanId: newEntry.jikanId,
         yourStatus: newEntry.yourStatus,
         rating: newEntry.rating,
-        [mediaConfig.watchedField]: newEntry[mediaConfig.watchedField],
+        consumed: newEntry.consumed,
         title: cachedData.title,
         imageUrl: cachedData.imageUrl,
         year: cachedData.year,
-        [mediaConfig.releasedField]: cachedData[mediaConfig.releasedField],
-        [mediaConfig.statusField]: cachedData[mediaConfig.statusField],
+        released: cachedData.released,
+        status: cachedData.status,
         createdAt: newEntry.createdAt,
         updatedAt: newEntry.updatedAt,
       };
@@ -210,12 +209,12 @@ export const createMediaController = (
         jikanId: updatedEntry.jikanId,
         yourStatus: updatedEntry.yourStatus,
         rating: updatedEntry.rating,
-        [mediaConfig.watchedField]: updatedEntry[mediaConfig.watchedField],
+        consumed: updatedEntry.consumed,
         title: cachedData.title,
         imageUrl: cachedData.imageUrl,
         year: cachedData.year,
-        [mediaConfig.releasedField]: cachedData[mediaConfig.releasedField],
-        [mediaConfig.statusField]: cachedData[mediaConfig.statusField],
+        released: cachedData.released,
+        status: cachedData.status,
         createdAt: updatedEntry.createdAt,
         updatedAt: updatedEntry.updatedAt,
       };
@@ -294,8 +293,8 @@ export const createMediaController = (
 
       // Get cached data to check total
       const cachedData = await getCachedMedia(entry.jikanId);
-      const totalCount = cachedData[mediaConfig.releasedField] || 0;
-      const currentProgress = entry[mediaConfig.watchedField] || 0;
+      const totalCount = cachedData.released || 0;
+      const currentProgress = entry.consumed || 0;
 
       // Don't increment if already at max
       if (totalCount > 0 && currentProgress >= totalCount) {
@@ -307,7 +306,7 @@ export const createMediaController = (
 
       // Increment progress
       const updateData = {
-        [mediaConfig.watchedField]: currentProgress + 1,
+        consumed: currentProgress + 1,
       };
 
       // Auto-complete if reached total
@@ -328,12 +327,12 @@ export const createMediaController = (
         jikanId: updatedEntry.jikanId,
         yourStatus: updatedEntry.yourStatus,
         rating: updatedEntry.rating,
-        [mediaConfig.watchedField]: updatedEntry[mediaConfig.watchedField],
+        consumed: updatedEntry.consumed,
         title: cachedData.title,
         imageUrl: cachedData.imageUrl,
         year: cachedData.year,
-        [mediaConfig.releasedField]: cachedData[mediaConfig.releasedField],
-        [mediaConfig.statusField]: cachedData[mediaConfig.statusField],
+        released: cachedData.released,
+        status: cachedData.status,
         createdAt: updatedEntry.createdAt,
         updatedAt: updatedEntry.updatedAt,
       };
@@ -371,8 +370,8 @@ export const createMediaController = (
 
       // Get cached data to check total
       const cachedData = await getCachedMedia(entry.jikanId);
-      const totalCount = cachedData[mediaConfig.releasedField] || 0;
-      const currentProgress = entry[mediaConfig.watchedField] || 0;
+      const totalCount = cachedData.released || 0;
+      const currentProgress = entry.consumed || 0;
 
       // Don't decrement if already at 0
       if (currentProgress <= 0) {
@@ -384,7 +383,7 @@ export const createMediaController = (
 
       // Decrement progress
       const updateData = {
-        [mediaConfig.watchedField]: Math.max(0, currentProgress - 1),
+        consumed: Math.max(0, currentProgress - 1),
       };
 
       // If decreasing from completed total, change status back to Active
@@ -411,13 +410,12 @@ export const createMediaController = (
         jikanId: updatedEntry.jikanId,
         yourStatus: updatedEntry.yourStatus,
         rating: updatedEntry.rating,
-        [mediaConfig.watchedField]: updatedEntry[mediaConfig.watchedField],
+        consumed: updatedEntry.consumed,
         title: responseCachedData.title,
         imageUrl: responseCachedData.imageUrl,
         year: responseCachedData.year,
-        [mediaConfig.releasedField]:
-          responseCachedData[mediaConfig.releasedField],
-        [mediaConfig.statusField]: responseCachedData[mediaConfig.statusField],
+        released: responseCachedData.released,
+        status: responseCachedData.status,
         createdAt: updatedEntry.createdAt,
         updatedAt: updatedEntry.updatedAt,
       };
@@ -428,6 +426,43 @@ export const createMediaController = (
     }
   };
 
+  const preFetchCache = async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      console.log(
+        `[${mediaConfig.name}Controller] Pre-fetching cache for ID:`,
+        id
+      );
+
+      // Get cached data (this will fetch from API if not cached)
+      const cachedData = await getCachedMedia(id);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          jikanId: cachedData.jikanId,
+          title: cachedData.title,
+          imageUrl: cachedData.imageUrl,
+          year: cachedData.year,
+          released: cachedData.released,
+          status: cachedData.status,
+        },
+      });
+    } catch (error) {
+      console.warn(
+        `[${mediaConfig.name}Controller] Failed to pre-fetch cache:`,
+        error
+      );
+      // Return a fallback response instead of error
+      res.status(200).json({
+        success: false,
+        message: "Failed to fetch detailed data",
+        data: null,
+      });
+    }
+  };
+
   return {
     getAllEntries,
     createEntry,
@@ -435,5 +470,6 @@ export const createMediaController = (
     deleteEntry,
     incrementProgress,
     decrementProgress,
+    preFetchCache,
   };
 };

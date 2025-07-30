@@ -14,25 +14,31 @@ export default function Card({
     _id,
     title,
     year,
+    status,
+    yourStatus,
+    consumed,
+    released,
+    rating,
+    imageUrl,
+    // Legacy field names for backward compatibility
     animeStatus,
     mangaStatus,
     showStatus,
     comicStatus,
-    yourStatus,
     episodesWatched,
     chaptersRead,
     issuesRead,
     episodesTotal,
     chaptersTotal,
     issuesTotal,
-    rating,
-    imageUrl,
   } = entry;
 
-  // Get the correct status and progress values based on media type
-  const mediaStatus = entry[mediaConfig.statusField] || animeStatus;
-  const watchedCount = entry[mediaConfig.watchedField] || episodesWatched || 0;
-  const totalCount = entry[mediaConfig.releasedField] || episodesTotal || 0;
+  // Get the correct status and progress values (prioritize standardized fields)
+  const mediaStatus = status || entry[mediaConfig.statusField] || animeStatus;
+  const watchedCount =
+    consumed || entry[mediaConfig.consumedField] || episodesWatched || 0;
+  const totalCount =
+    released || entry[mediaConfig.releasedField] || episodesTotal || 0;
   const maxStars = 5;
   const filledStars = Math.floor(rating);
   const stars = Array.from({ length: maxStars }, (_, i) => (

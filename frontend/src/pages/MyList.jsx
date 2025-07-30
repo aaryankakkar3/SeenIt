@@ -113,6 +113,7 @@ function MyList() {
             isOpen={isSearchAnimeModalOpen}
             onClose={handleCloseSearchModal}
             onSelectResult={handleSelectQueryResult}
+            mediaType={currentSection}
           />
 
           <EditAnimeModal
