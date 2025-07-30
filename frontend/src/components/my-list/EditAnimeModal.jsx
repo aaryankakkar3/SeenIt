@@ -8,6 +8,205 @@ import { useExternalStore } from "../../store/external.store";
 import { MEDIA_TYPES } from "../../lib/mediaConfig";
 import { toast } from "react-hot-toast";
 
+// Move component functions outside to prevent recreation on every render
+function YearBox({ year }) {
+  return (
+    <div className="flex flex-col gap-[6px] w-full">
+      <div className="font-semibold">Year</div>
+      <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
+        {year || "Unknown"}
+      </div>
+    </div>
+  );
+}
+
+function StatusBox({ mediaStatus }) {
+  return (
+    <div className="flex flex-col gap-[6px] w-full">
+      <div className="font-semibold">Status</div>
+      <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
+        {mediaStatus}
+      </div>
+    </div>
+  );
+}
+
+function ReleasedBox({ mediaConfig, totalCount }) {
+  return (
+    <div className="flex flex-col gap-[6px] w-full">
+      <div className="font-semibold">Released {mediaConfig.releasedLabel}</div>
+      <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
+        {totalCount || "Unknown"}
+      </div>
+    </div>
+  );
+}
+
+function ConsumedBox({
+  mediaConfig,
+  watchedEp,
+  handleEpisodesWatchedChange,
+  handleSubmit,
+  totalCount,
+}) {
+  return (
+    <div className="flex flex-col gap-[6px] w-full text-text">
+      <div className="font-semibold">{mediaConfig.consumedLabel}</div>
+      <div className="w-full h-[40px] bg-light px-[12px]">
+        <input
+          autoComplete="off"
+          type="number"
+          value={watchedEp}
+          onChange={handleEpisodesWatchedChange}
+          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+          id="episodesWatched"
+          min="0"
+          max={totalCount > 0 ? totalCount : undefined}
+          placeholder={`0 - ${totalCount || "?"}`}
+          className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        />
+      </div>
+    </div>
+  );
+}
+
+function RatingBox({ rating, handleRatingChange, handleSubmit }) {
+  return (
+    <div className="flex flex-col gap-[6px] w-full text-text">
+      <div className="font-semibold">Rating</div>
+      <div className="w-full h-[40px] bg-light px-[12px]">
+        <input
+          autoComplete="off"
+          type="number"
+          id="rating"
+          onChange={handleRatingChange}
+          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+          value={rating}
+          min="0"
+          max="5"
+          step="0.1"
+          placeholder="0 - 5"
+          className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        />
+      </div>
+    </div>
+  );
+}
+
+function ProgressBox({ handleSubmit }) {
+  return (
+    <div className="flex flex-col gap-[6px] w-full text-text">
+      <div className="font-semibold">Progress %</div>
+      <div className="w-full h-[40px] bg-light px-[12px]">
+        <input
+          autoComplete="off"
+          type="number"
+          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+          min="0"
+          max="100"
+          placeholder="0 - 100"
+          className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        />
+      </div>
+    </div>
+  );
+}
+
+function DivOne({
+  currentSection,
+  year,
+  mediaStatus,
+  rating,
+  handleRatingChange,
+  handleSubmit,
+}) {
+  if (
+    currentSection === "animes" ||
+    currentSection === "mangas" ||
+    currentSection === "shows" ||
+    currentSection === "comics"
+  ) {
+    return (
+      <div className="flex flex-row gap-[12px] w-full">
+        <YearBox year={year} />
+        <StatusBox mediaStatus={mediaStatus} />
+      </div>
+    );
+  } else if (currentSection === "games") {
+    return (
+      <div className="flex flex-row gap-[12px] w-full">
+        <YearBox year={year} />
+        <RatingBox
+          rating={rating}
+          handleRatingChange={handleRatingChange}
+          handleSubmit={handleSubmit}
+        />
+        <ProgressBox handleSubmit={handleSubmit} />
+      </div>
+    );
+  } else {
+    return (
+      <div className="flex flex-row gap-[12px] w-full">
+        <YearBox year={year} />
+        <RatingBox
+          rating={rating}
+          handleRatingChange={handleRatingChange}
+          handleSubmit={handleSubmit}
+        />
+      </div>
+    );
+  }
+}
+
+function DivTwo({
+  currentSection,
+  mediaConfig,
+  totalCount,
+  watchedEp,
+  handleEpisodesWatchedChange,
+  handleSubmit,
+  rating,
+  handleRatingChange,
+}) {
+  if (
+    currentSection === "animes" ||
+    currentSection === "mangas" ||
+    currentSection === "shows" ||
+    currentSection === "comics"
+  ) {
+    return (
+      <div className="flex flex-row gap-[12px] w-full">
+        <ReleasedBox mediaConfig={mediaConfig} totalCount={totalCount} />
+        <ConsumedBox
+          mediaConfig={mediaConfig}
+          watchedEp={watchedEp}
+          handleEpisodesWatchedChange={handleEpisodesWatchedChange}
+          handleSubmit={handleSubmit}
+          totalCount={totalCount}
+        />
+        <RatingBox
+          rating={rating}
+          handleRatingChange={handleRatingChange}
+          handleSubmit={handleSubmit}
+        />
+      </div>
+    );
+  } else if (currentSection === "books") {
+    return (
+      <div className="flex flex-row gap-[12px] w-full">
+        <ReleasedBox mediaConfig={mediaConfig} totalCount={totalCount} />
+        <ConsumedBox
+          mediaConfig={mediaConfig}
+          watchedEp={watchedEp}
+          handleEpisodesWatchedChange={handleEpisodesWatchedChange}
+          handleSubmit={handleSubmit}
+          totalCount={totalCount}
+        />
+      </div>
+    );
+  }
+}
+
 export default function EditAnimeModal({
   isOpen,
   onClose,
@@ -16,7 +215,6 @@ export default function EditAnimeModal({
   onCloseAll,
   currentSection,
 }) {
-  // currentSection = "movies";
   const [selectedStatus, setSelectedStatus] = useState("Planned");
   const [rating, setRating] = useState(0);
   const [watchedEp, setWatchedEp] = useState("");
@@ -294,150 +492,9 @@ export default function EditAnimeModal({
 
   if (!isOpen || !modalData) return null;
 
-  function YearBox() {
-    return (
-      <div className="flex flex-col gap-[6px] w-full">
-        <div className="font-semibold">Year</div>
-        <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
-          {year || "Unknown"}
-        </div>
-      </div>
-    );
-  }
-
-  function StatusBox() {
-    return (
-      <div className="flex flex-col gap-[6px] w-full">
-        <div className="font-semibold">Status</div>
-        <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
-          {mediaStatus}
-        </div>
-      </div>
-    );
-  }
-
-  function ReleasedBox() {
-    return (
-      <div className="flex flex-col gap-[6px] w-full">
-        <div className="font-semibold">
-          Released {mediaConfig.releasedLabel}
-        </div>
-        <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
-          {totalCount || "Unknown"}
-        </div>
-      </div>
-    );
-  }
-
-  function TotalBox() {
-    return (
-      <div className="flex flex-col gap-[6px] w-full text-text">
-        <div className="font-semibold">{mediaConfig.consumedLabel}</div>
-        <div className="w-full h-[40px] bg-light px-[12px]">
-          <input
-            autoComplete="off"
-            type="number"
-            value={watchedEp}
-            onChange={handleEpisodesWatchedChange}
-            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-            id="episodesWatched"
-            min="0"
-            max={totalCount > 0 ? totalCount : undefined}
-            placeholder={`0 - ${totalCount || "?"}`}
-            className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-        </div>
-      </div>
-    );
-  }
-
-  function RatingBox() {
-    return (
-      <div className="flex flex-col gap-[6px] w-full text-text">
-        <div className="font-semibold">Rating</div>
-        <div className="w-full h-[40px] bg-light px-[12px]">
-          <input
-            autoComplete="off"
-            type="number"
-            id="rating"
-            onChange={handleRatingChange}
-            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-            value={rating}
-            min="0"
-            max="5"
-            step="0.1"
-            placeholder="0 - 5"
-            className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-        </div>
-      </div>
-    );
-  }
-
-  function ProgressBox() {
-    return (
-      <div className="flex flex-col gap-[6px] w-full text-text">
-        <div className="font-semibold">Progress</div>
-        <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
-          Progress Info
-        </div>
-      </div>
-    );
-  }
-
-  function DivOne() {
-    if (
-      currentSection === "animes" ||
-      currentSection === "mangas" ||
-      currentSection === "shows" ||
-      currentSection === "comics"
-    ) {
-      return (
-        <div className="flex flex-row gap-[12px] w-full">
-          <YearBox />
-          <StatusBox />
-        </div>
-      );
-    } else if (currentSection === "games") {
-      return (
-        <div className="flex flex-row gap-[12px] w-full">
-          <YearBox />
-          <RatingBox />
-          <ProgressBox />
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex flex-row gap-[12px] w-full">
-          <YearBox />
-          <RatingBox />
-        </div>
-      );
-    }
-  }
-
-  function DivTwo() {
-    if (
-      currentSection === "animes" ||
-      currentSection === "mangas" ||
-      currentSection === "shows" ||
-      currentSection === "comics"
-    ) {
-      return (
-        <div className="flex flex-row gap-[12px] w-full">
-          <ReleasedBox />
-          <TotalBox />
-          <RatingBox />
-        </div>
-      );
-    } else if (currentSection === "books") {
-      return (
-        <div className="flex flex-row gap-[12px] w-full">
-          <ReleasedBox />
-          <TotalBox />
-        </div>
-      );
-    }
+  let imageHeight = "h-[381px]";
+  if (currentSection === "movies" || currentSection === "games") {
+    imageHeight = "h-[300px]";
   }
 
   return (
@@ -459,8 +516,11 @@ export default function EditAnimeModal({
           />
         </div>
         <div className="flex flex-row gap-[32px]">
-          <img src={imageUrl} className="h-full" />
-          <div className="flex flex-col gap-[32px]">
+          <img
+            src={imageUrl}
+            className={`object-cover aspect-[267/381] ${imageHeight}`}
+          />
+          <div className="flex flex-col gap-[32px] h-fit">
             <div className="flex flex-col gap-[16px] text-textmuted text-p2">
               <div className="flex flex-col gap-[6px]">
                 <div className="font-semibold">Name</div>
@@ -468,9 +528,16 @@ export default function EditAnimeModal({
                   {title || "Unknown Title"}
                 </div>
               </div>
-              <DivOne />
+              <DivOne
+                currentSection={currentSection}
+                year={year}
+                mediaStatus={mediaStatus}
+                rating={rating}
+                handleRatingChange={handleRatingChange}
+                handleSubmit={handleSubmit}
+              />
 
-              {/* Your Status Bar */}
+              {/* YourStatus Bar */}
               <div className="flex flex-row gap-[12px] w-full">
                 <div className="flex flex-col gap-[6px] w-full text-text">
                   <div className="font-semibold">Your Status</div>
@@ -492,7 +559,16 @@ export default function EditAnimeModal({
                 </div>
               </div>
 
-              <DivTwo />
+              <DivTwo
+                currentSection={currentSection}
+                mediaConfig={mediaConfig}
+                totalCount={totalCount}
+                watchedEp={watchedEp}
+                handleEpisodesWatchedChange={handleEpisodesWatchedChange}
+                handleSubmit={handleSubmit}
+                rating={rating}
+                handleRatingChange={handleRatingChange}
+              />
             </div>
             <div className="w-full h-[40px] flex flex-row gap-[12px]">
               <button

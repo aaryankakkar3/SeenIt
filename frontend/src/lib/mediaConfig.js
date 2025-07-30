@@ -53,45 +53,34 @@ export const MEDIA_TYPES = {
     apiEndpoint: "/comics",
   },
 
-  // Edit MediaConfig
   books: {
     name: "Books",
     displayName: "Books",
     // Internal field names (standardized)
     statusField: "status",
-    releasedField: "released",
-    consumedField: "consumed",
+    releasedField: "total",
+    consumedField: "read",
     // Display labels (what users see)
-    releasedLabel: "Iss",
-    consumedLabel: "Iss Read",
-    addButtonText: "Add Comic",
-    apiEndpoint: "/comics",
+    releasedLabel: "Pgs",
+    consumedLabel: "Pgs Read",
+    addButtonText: "Add Book",
+    apiEndpoint: "/books",
   },
   games: {
-    name: "Comics",
-    displayName: "Comics",
+    name: "Games",
+    displayName: "Games",
     // Internal field names (standardized)
     statusField: "status",
-    releasedField: "released",
-    consumedField: "consumed",
-    // Display labels (what users see)
-    releasedLabel: "Iss",
-    consumedLabel: "Iss Read",
-    addButtonText: "Add Comic",
-    apiEndpoint: "/comics",
+    addButtonText: "Add Game",
+    apiEndpoint: "/games",
   },
   movies: {
-    name: "Comics",
-    displayName: "Comics",
+    name: "Movies",
+    displayName: "Movies",
     // Internal field names (standardized)
     statusField: "status",
-    releasedField: "released",
-    consumedField: "consumed",
-    // Display labels (what users see)
-    releasedLabel: "Iss",
-    consumedLabel: "Iss Read",
-    addButtonText: "Add Comic",
-    apiEndpoint: "/comics",
+    addButtonText: "Add Movie",
+    apiEndpoint: "/movies",
   },
 };
 
