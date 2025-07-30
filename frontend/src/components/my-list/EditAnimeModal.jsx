@@ -16,6 +16,7 @@ export default function EditAnimeModal({
   onCloseAll,
   currentSection,
 }) {
+  // currentSection = "movies";
   const [selectedStatus, setSelectedStatus] = useState("Planned");
   const [rating, setRating] = useState(0);
   const [watchedEp, setWatchedEp] = useState("");
@@ -294,12 +295,14 @@ export default function EditAnimeModal({
   if (!isOpen || !modalData) return null;
 
   function YearBox() {
-    <div className="flex flex-col gap-[6px] w-full">
-      <div className="font-semibold">Year</div>
-      <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
-        {year || "Unknown"}
+    return (
+      <div className="flex flex-col gap-[6px] w-full">
+        <div className="font-semibold">Year</div>
+        <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
+          {year || "Unknown"}
+        </div>
       </div>
-    </div>;
+    );
   }
 
   function StatusBox() {
@@ -371,13 +374,79 @@ export default function EditAnimeModal({
     );
   }
 
+  function ProgressBox() {
+    return (
+      <div className="flex flex-col gap-[6px] w-full text-text">
+        <div className="font-semibold">Progress</div>
+        <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
+          Progress Info
+        </div>
+      </div>
+    );
+  }
+
+  function DivOne() {
+    if (
+      currentSection === "animes" ||
+      currentSection === "mangas" ||
+      currentSection === "shows" ||
+      currentSection === "comics"
+    ) {
+      return (
+        <div className="flex flex-row gap-[12px] w-full">
+          <YearBox />
+          <StatusBox />
+        </div>
+      );
+    } else if (currentSection === "games") {
+      return (
+        <div className="flex flex-row gap-[12px] w-full">
+          <YearBox />
+          <RatingBox />
+          <ProgressBox />
+        </div>
+      );
+    } else {
+      return (
+        <div className="flex flex-row gap-[12px] w-full">
+          <YearBox />
+          <RatingBox />
+        </div>
+      );
+    }
+  }
+
+  function DivTwo() {
+    if (
+      currentSection === "animes" ||
+      currentSection === "mangas" ||
+      currentSection === "shows" ||
+      currentSection === "comics"
+    ) {
+      return (
+        <div className="flex flex-row gap-[12px] w-full">
+          <ReleasedBox />
+          <TotalBox />
+          <RatingBox />
+        </div>
+      );
+    } else if (currentSection === "books") {
+      return (
+        <div className="flex flex-row gap-[12px] w-full">
+          <ReleasedBox />
+          <TotalBox />
+        </div>
+      );
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div className="fixed inset-0 transition-opacity" onClick={onCloseAll} />
 
       {/* EditAnimeModal Content */}
-      <div className="relative z-60 w-[884px] h-[580px] bg-medium flex flex-col p-[64px] gap-[32px]">
+      <div className="relative z-60 bg-medium flex flex-col p-[64px] gap-[32px]">
         <div className="flex flex-row justify-between">
           <div className="text-h2 text-text">
             {isEditing
@@ -389,9 +458,9 @@ export default function EditAnimeModal({
             onClick={onCloseAll}
           />
         </div>
-        <div className="flex flex-row h-[381px] w-[756px] gap-[32px]">
-          <img src={imageUrl} className="h-[381px] w-[267px]" />
-          <div className="flex flex-col h-[381px] w-[457px] gap-[32px]">
+        <div className="flex flex-row gap-[32px]">
+          <img src={imageUrl} className="h-full" />
+          <div className="flex flex-col gap-[32px]">
             <div className="flex flex-col gap-[16px] text-textmuted text-p2">
               <div className="flex flex-col gap-[6px]">
                 <div className="font-semibold">Name</div>
@@ -399,10 +468,7 @@ export default function EditAnimeModal({
                   {title || "Unknown Title"}
                 </div>
               </div>
-              <div className="flex flex-row gap-[12px] w-full">
-                <YearBox />
-                <StatusBox />
-              </div>
+              <DivOne />
 
               {/* Your Status Bar */}
               <div className="flex flex-row gap-[12px] w-full">
@@ -426,11 +492,7 @@ export default function EditAnimeModal({
                 </div>
               </div>
 
-              <div className="flex flex-row gap-[12px] w-full">
-                <ReleasedBox />
-                <TotalBox />
-                <RatingBox />
-              </div>
+              <DivTwo />
             </div>
             <div className="w-full h-[40px] flex flex-row gap-[12px]">
               <button

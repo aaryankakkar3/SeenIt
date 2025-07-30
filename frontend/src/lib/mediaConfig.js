@@ -52,6 +52,47 @@ export const MEDIA_TYPES = {
     addButtonText: "Add Comic",
     apiEndpoint: "/comics",
   },
+
+  // Edit MediaConfig
+  books: {
+    name: "Books",
+    displayName: "Books",
+    // Internal field names (standardized)
+    statusField: "status",
+    releasedField: "released",
+    consumedField: "consumed",
+    // Display labels (what users see)
+    releasedLabel: "Iss",
+    consumedLabel: "Iss Read",
+    addButtonText: "Add Comic",
+    apiEndpoint: "/comics",
+  },
+  games: {
+    name: "Comics",
+    displayName: "Comics",
+    // Internal field names (standardized)
+    statusField: "status",
+    releasedField: "released",
+    consumedField: "consumed",
+    // Display labels (what users see)
+    releasedLabel: "Iss",
+    consumedLabel: "Iss Read",
+    addButtonText: "Add Comic",
+    apiEndpoint: "/comics",
+  },
+  movies: {
+    name: "Comics",
+    displayName: "Comics",
+    // Internal field names (standardized)
+    statusField: "status",
+    releasedField: "released",
+    consumedField: "consumed",
+    // Display labels (what users see)
+    releasedLabel: "Iss",
+    consumedLabel: "Iss Read",
+    addButtonText: "Add Comic",
+    apiEndpoint: "/comics",
+  },
 };
 
 export const AVAILABLE_SECTIONS = Object.keys(MEDIA_TYPES);
