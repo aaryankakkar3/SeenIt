@@ -82,7 +82,6 @@ export const createMediaStore = (mediaConfig) => {
             entry._id === entryId ? response.data.data : entry
           ),
         }));
-        toast.success(`${mediaConfig.consumedLabel} incremented`);
       } catch (error) {
         toast.error(
           `Failed to increment ${mediaConfig.consumedLabel.toLowerCase()}`
@@ -110,7 +109,6 @@ export const createMediaStore = (mediaConfig) => {
             entry._id === entryId ? response.data.data : entry
           ),
         }));
-        toast.success(`${mediaConfig.consumedLabel} decremented`);
       } catch (error) {
         toast.error(
           `Failed to decrement ${mediaConfig.consumedLabel.toLowerCase()}`
