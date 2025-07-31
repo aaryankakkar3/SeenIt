@@ -103,11 +103,73 @@ export const fetchData = async (req, res) => {
           }) || [];
         break;
 
+      case "books":
+        // Google Books API
+        apiUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
+          query
+        )}&maxResults=10`;
+        const booksResponse = await fetch(apiUrl);
+        const booksData = await booksResponse.json();
+
+        transformedResults =
+          booksData.items?.map((book) => ({
+            title: book.volumeInfo?.title || "Unknown",
+            year: book.volumeInfo?.publishedDate
+              ? new Date(book.volumeInfo.publishedDate).getFullYear()
+              : "Unknown",
+            imageUrl:
+              book.volumeInfo?.imageLinks?.thumbnail ||
+              book.volumeInfo?.imageLinks?.smallThumbnail ||
+              "https://placehold.co/90x129",
+            jikanId: book.id,
+            released: book.volumeInfo?.pageCount || 0, // Total pages for books
+          })) || [];
+        break;
+
+      case "games":
+        // RAWG API for games
+        apiUrl = `https://api.rawg.io/api/games?key=023e16f4c9fe44c4b1c498ff067eb5aa&search=${encodeURIComponent(
+          query
+        )}&page_size=10`;
+        const gamesResponse = await fetch(apiUrl);
+        const gamesData = await gamesResponse.json();
+
+        transformedResults =
+          gamesData.results?.map((game) => ({
+            title: game.name,
+            year: game.released
+              ? new Date(game.released).getFullYear()
+              : "Unknown",
+            imageUrl: game.background_image || "https://placehold.co/90x129",
+            jikanId: game.id,
+          })) || [];
+        break;
+
+      case "movies":
+        // OMDB API for movies
+        apiUrl = `https://www.omdbapi.com/?s=${encodeURIComponent(
+          query
+        )}&apikey=5bcaca7e&type=movie&page=1`;
+        const moviesResponse = await fetch(apiUrl);
+        const moviesData = await moviesResponse.json();
+
+        transformedResults =
+          moviesData.Search?.map((movie) => ({
+            title: movie.Title,
+            year: movie.Year || "Unknown",
+            imageUrl:
+              movie.Poster !== "N/A"
+                ? movie.Poster
+                : "https://placehold.co/90x129",
+            jikanId: movie.imdbID,
+          })) || [];
+        break;
+
       default:
         return res.status(400).json({
           success: false,
           message:
-            "Invalid media type. Supported types: anime, manga, shows, comics",
+            "Invalid media type. Supported types: anime, manga, shows, comics, books, games, movies",
         });
     }
 
@@ -125,3 +187,7 @@ export const fetchData = async (req, res) => {
     });
   }
 };
+
+// books - https://www.googleapis.com/books/v1/volumes?q=harry+potter
+// games - https://api.rawg.io/api/games?key=023e16f4c9fe44c4b1c498ff067eb5aa&search=spider-man
+// movies https://www.omdbapi.com/?s=jurassic park&apikey=5bcaca7e&type=movie
