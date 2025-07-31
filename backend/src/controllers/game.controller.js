@@ -9,9 +9,18 @@ const mediaConfig = {
   watchedLabel: "Progress",
 };
 
-const { getCachedMedia } = createCacheService(GameCache, mediaConfig);
+const { getCachedMedia, cacheMediaFromSearch } = createCacheService(
+  GameCache,
+  mediaConfig
+);
 
 const { getAllEntries, createEntry, updateEntry, deleteEntry } =
-  createMediaController(GameEntry, GameCache, getCachedMedia, mediaConfig);
+  createMediaController(
+    GameEntry,
+    GameCache,
+    getCachedMedia,
+    cacheMediaFromSearch,
+    mediaConfig
+  );
 
 export { getAllEntries, createEntry, updateEntry, deleteEntry };

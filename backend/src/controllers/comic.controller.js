@@ -12,7 +12,10 @@ const mediaConfig = {
   watchedLabel: "Issues Read",
 };
 
-const { getCachedMedia } = createCacheService(ComicCache, mediaConfig);
+const { getCachedMedia, cacheMediaFromSearch } = createCacheService(
+  ComicCache,
+  mediaConfig
+);
 
 const {
   getAllEntries,
@@ -22,7 +25,13 @@ const {
   incrementProgress,
   decrementProgress,
   preFetchCache,
-} = createMediaController(ComicEntry, ComicCache, getCachedMedia, mediaConfig);
+} = createMediaController(
+  ComicEntry,
+  ComicCache,
+  getCachedMedia,
+  cacheMediaFromSearch,
+  mediaConfig
+);
 
 export {
   getAllEntries,

@@ -12,7 +12,10 @@ const mediaConfig = {
   watchedLabel: "Episodes Watched",
 };
 
-const { getCachedMedia } = createCacheService(AnimeCache, mediaConfig);
+const { getCachedMedia, cacheMediaFromSearch } = createCacheService(
+  AnimeCache,
+  mediaConfig
+);
 
 const {
   getAllEntries,
@@ -21,7 +24,13 @@ const {
   deleteEntry,
   incrementProgress,
   decrementProgress,
-} = createMediaController(AnimeEntry, AnimeCache, getCachedMedia, mediaConfig);
+} = createMediaController(
+  AnimeEntry,
+  AnimeCache,
+  getCachedMedia,
+  cacheMediaFromSearch,
+  mediaConfig
+);
 
 // Export with the old function names for backward compatibility
 export {

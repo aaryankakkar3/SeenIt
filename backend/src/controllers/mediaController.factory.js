@@ -5,6 +5,7 @@ export const createMediaController = (
   MediaModel,
   CacheModel,
   getCachedMedia,
+  cacheMediaFromSearch,
   mediaConfig
 ) => {
   function handleError(res, error, context = "") {
@@ -31,13 +32,13 @@ export const createMediaController = (
             // Get cached data (will refresh if stale)
             const cachedData = await getCachedMedia(entry.jikanId);
 
-            return {
+            // Build response data with correct field mapping
+            const responseData = {
               _id: entry._id,
               userId: entry.userId,
               jikanId: entry.jikanId,
               yourStatus: entry.yourStatus,
               rating: entry.rating,
-              consumed: entry.consumed,
               // Cached data
               title: cachedData.title,
               imageUrl: cachedData.imageUrl,
@@ -47,6 +48,15 @@ export const createMediaController = (
               createdAt: entry.createdAt,
               updatedAt: entry.updatedAt,
             };
+
+            // Add progress field based on media type
+            if (mediaConfig.watchedField === "consumed") {
+              responseData.consumed = entry.consumed;
+            } else if (mediaConfig.watchedField === "progress") {
+              responseData.progress = entry.progress;
+            }
+
+            return responseData;
           } catch (cacheError) {
             // If cache fails, return entry with basic info
             console.error(
@@ -83,6 +93,7 @@ export const createMediaController = (
 
   const createEntry = async (req, res) => {
     try {
+      console.log("Req body", req.body);
       console.log(`[${mediaConfig.name}Controller] Create entry request:`, {
         body: req.body,
         userId: req.user._id,
@@ -123,35 +134,60 @@ export const createMediaController = (
       // Set userId from authenticated user
       mediaData.userId = req.user._id;
 
+      // Create cache entry from form data if it contains complete data
+      let cachedData;
+      if (mediaData.title && mediaData.imageUrl) {
+        // Form data contains complete information, create cache entry
+        try {
+          cachedData = await cacheMediaFromSearch(mediaData.jikanId, {
+            title: mediaData.title,
+            year: mediaData.year || 0,
+            imageUrl: mediaData.imageUrl,
+            released: mediaData.released || 0,
+            status: mediaData.status || "Unknown",
+          });
+        } catch (cacheError) {
+          console.warn(
+            `Failed to cache ${mediaConfig.name.toLowerCase()} data:`,
+            cacheError
+          );
+          cachedData = {
+            title: mediaData.title,
+            imageUrl: mediaData.imageUrl,
+            year: mediaData.year || 0,
+            released: mediaData.released || 0,
+            status: mediaData.status || "Unknown",
+          };
+        }
+      } else {
+        // Fallback to getting existing cache or API data
+        try {
+          cachedData = await getCachedMedia(mediaData.jikanId);
+        } catch (cacheError) {
+          console.warn(
+            `Failed to get cached ${mediaConfig.name.toLowerCase()} data for response:`,
+            cacheError
+          );
+          cachedData = {
+            title: "Unknown Title",
+            imageUrl: "https://placehold.co/90x129",
+            year: 0,
+            released: 0,
+            status: "Unknown",
+          };
+        }
+      }
+
       // Create new entry
       const newEntry = new MediaModel(mediaData);
       await newEntry.save();
-
-      // Get cached data for response
-      let cachedData;
-      try {
-        cachedData = await getCachedMedia(mediaData.jikanId);
-      } catch (cacheError) {
-        console.warn(
-          `Failed to get cached ${mediaConfig.name.toLowerCase()} data for response:`,
-          cacheError
-        );
-        // Provide fallback data if cache fails
-        cachedData = {
-          title: "Unknown Title",
-          imageUrl: "https://placehold.co/90x129",
-          year: 0,
-          [mediaConfig.releasedField]: 0,
-          [mediaConfig.statusField]: "Unknown",
-        };
-      }
+      // Build response data with correct field mapping
       const responseData = {
         _id: newEntry._id,
         userId: newEntry.userId,
         jikanId: newEntry.jikanId,
         yourStatus: newEntry.yourStatus,
         rating: newEntry.rating,
-        consumed: newEntry.consumed,
         title: cachedData.title,
         imageUrl: cachedData.imageUrl,
         year: cachedData.year,
@@ -160,6 +196,13 @@ export const createMediaController = (
         createdAt: newEntry.createdAt,
         updatedAt: newEntry.updatedAt,
       };
+
+      // Add progress field based on media type
+      if (mediaConfig.watchedField === "consumed") {
+        responseData.consumed = newEntry.consumed;
+      } else if (mediaConfig.watchedField === "progress") {
+        responseData.progress = newEntry.progress;
+      }
 
       res.status(201).json({ success: true, data: responseData });
     } catch (error) {
@@ -201,7 +244,7 @@ export const createMediaController = (
         });
       }
 
-      // Get cached data and combine
+      // Get cached data and combine with proper field mapping
       const cachedData = await getCachedMedia(updatedEntry.jikanId);
       const responseData = {
         _id: updatedEntry._id,
@@ -209,7 +252,6 @@ export const createMediaController = (
         jikanId: updatedEntry.jikanId,
         yourStatus: updatedEntry.yourStatus,
         rating: updatedEntry.rating,
-        consumed: updatedEntry.consumed,
         title: cachedData.title,
         imageUrl: cachedData.imageUrl,
         year: cachedData.year,
@@ -218,6 +260,13 @@ export const createMediaController = (
         createdAt: updatedEntry.createdAt,
         updatedAt: updatedEntry.updatedAt,
       };
+
+      // Add progress field based on media type
+      if (mediaConfig.watchedField === "consumed") {
+        responseData.consumed = updatedEntry.consumed;
+      } else if (mediaConfig.watchedField === "progress") {
+        responseData.progress = updatedEntry.progress;
+      }
 
       res.status(200).json({ success: true, data: responseData });
     } catch (error) {
@@ -294,7 +343,14 @@ export const createMediaController = (
       // Get cached data to check total
       const cachedData = await getCachedMedia(entry.jikanId);
       const totalCount = cachedData.released || 0;
-      const currentProgress = entry.consumed || 0;
+
+      // Get current progress based on media type
+      let currentProgress = 0;
+      if (mediaConfig.watchedField === "consumed") {
+        currentProgress = entry.consumed || 0;
+      } else if (mediaConfig.watchedField === "progress") {
+        currentProgress = entry.progress || 0;
+      }
 
       // Don't increment if already at max
       if (totalCount > 0 && currentProgress >= totalCount) {
@@ -304,10 +360,13 @@ export const createMediaController = (
         });
       }
 
-      // Increment progress
-      const updateData = {
-        consumed: currentProgress + 1,
-      };
+      // Increment progress based on media type
+      const updateData = {};
+      if (mediaConfig.watchedField === "consumed") {
+        updateData.consumed = currentProgress + 1;
+      } else if (mediaConfig.watchedField === "progress") {
+        updateData.progress = Math.min(currentProgress + 1, 100); // Cap at 100% for progress
+      }
 
       // Auto-complete if reached total
       if (totalCount > 0 && currentProgress + 1 >= totalCount) {
@@ -320,14 +379,13 @@ export const createMediaController = (
         { new: true, runValidators: true }
       );
 
-      // Return combined data
+      // Return combined data with proper field mapping
       const responseData = {
         _id: updatedEntry._id,
         userId: updatedEntry.userId,
         jikanId: updatedEntry.jikanId,
         yourStatus: updatedEntry.yourStatus,
         rating: updatedEntry.rating,
-        consumed: updatedEntry.consumed,
         title: cachedData.title,
         imageUrl: cachedData.imageUrl,
         year: cachedData.year,
@@ -336,6 +394,13 @@ export const createMediaController = (
         createdAt: updatedEntry.createdAt,
         updatedAt: updatedEntry.updatedAt,
       };
+
+      // Add progress field based on media type
+      if (mediaConfig.watchedField === "consumed") {
+        responseData.consumed = updatedEntry.consumed;
+      } else if (mediaConfig.watchedField === "progress") {
+        responseData.progress = updatedEntry.progress;
+      }
 
       res.status(200).json({ success: true, data: responseData });
     } catch (error) {
@@ -371,7 +436,14 @@ export const createMediaController = (
       // Get cached data to check total
       const cachedData = await getCachedMedia(entry.jikanId);
       const totalCount = cachedData.released || 0;
-      const currentProgress = entry.consumed || 0;
+
+      // Get current progress based on media type
+      let currentProgress = 0;
+      if (mediaConfig.watchedField === "consumed") {
+        currentProgress = entry.consumed || 0;
+      } else if (mediaConfig.watchedField === "progress") {
+        currentProgress = entry.progress || 0;
+      }
 
       // Don't decrement if already at 0
       if (currentProgress <= 0) {
@@ -381,10 +453,13 @@ export const createMediaController = (
         });
       }
 
-      // Decrement progress
-      const updateData = {
-        consumed: Math.max(0, currentProgress - 1),
-      };
+      // Decrement progress based on media type
+      const updateData = {};
+      if (mediaConfig.watchedField === "consumed") {
+        updateData.consumed = Math.max(0, currentProgress - 1);
+      } else if (mediaConfig.watchedField === "progress") {
+        updateData.progress = Math.max(0, currentProgress - 1);
+      }
 
       // If decreasing from completed total, change status back to Active
       if (
@@ -402,7 +477,7 @@ export const createMediaController = (
         { new: true, runValidators: true }
       );
 
-      // Get cached data and combine
+      // Get cached data and combine with proper field mapping
       const responseCachedData = await getCachedMedia(updatedEntry.jikanId);
       const responseData = {
         _id: updatedEntry._id,
@@ -410,7 +485,6 @@ export const createMediaController = (
         jikanId: updatedEntry.jikanId,
         yourStatus: updatedEntry.yourStatus,
         rating: updatedEntry.rating,
-        consumed: updatedEntry.consumed,
         title: responseCachedData.title,
         imageUrl: responseCachedData.imageUrl,
         year: responseCachedData.year,
@@ -419,6 +493,13 @@ export const createMediaController = (
         createdAt: updatedEntry.createdAt,
         updatedAt: updatedEntry.updatedAt,
       };
+
+      // Add progress field based on media type
+      if (mediaConfig.watchedField === "consumed") {
+        responseData.consumed = updatedEntry.consumed;
+      } else if (mediaConfig.watchedField === "progress") {
+        responseData.progress = updatedEntry.progress;
+      }
 
       res.status(200).json({ success: true, data: responseData });
     } catch (error) {

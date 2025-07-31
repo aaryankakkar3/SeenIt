@@ -5,6 +5,9 @@ import { useAnimeStore } from "../../store/anime.store";
 import { useMangaStore } from "../../store/manga.store";
 import { useShowsStore } from "../../store/shows.store";
 import { useComicsStore } from "../../store/comics.store";
+import { useBookStore } from "../../store/books.store";
+import { useGameStore } from "../../store/games.store";
+import { useMovieStore } from "../../store/movies.store";
 import { MEDIA_TYPES } from "../../lib/mediaConfig";
 import QueryItem from "./QueryItem";
 
@@ -29,6 +32,12 @@ export default function SearchModal({
         return useShowsStore();
       case "comics":
         return useComicsStore();
+      case "books":
+        return useBookStore();
+      case "games":
+        return useGameStore();
+      case "movies":
+        return useMovieStore();
       default:
         return useAnimeStore();
     }
@@ -50,6 +59,12 @@ export default function SearchModal({
         return "shows";
       case "comics":
         return "comics";
+      case "books":
+        return "books";
+      case "games":
+        return "games";
+      case "movies":
+        return "movies";
       default:
         return "anime";
     }

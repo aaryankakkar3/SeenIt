@@ -4,6 +4,9 @@ import { useAnimeStore } from "../../store/anime.store";
 import { useMangaStore } from "../../store/manga.store";
 import { useShowsStore } from "../../store/shows.store";
 import { useComicsStore } from "../../store/comics.store";
+import { useBookStore } from "../../store/books.store";
+import { useGameStore } from "../../store/games.store";
+import { useMovieStore } from "../../store/movies.store";
 import { useExternalStore } from "../../store/external.store";
 import { MEDIA_TYPES } from "../../lib/mediaConfig";
 import { toast } from "react-hot-toast";
@@ -93,7 +96,7 @@ function RatingBox({ rating, handleRatingChange, handleSubmit }) {
   );
 }
 
-function ProgressBox({ handleSubmit }) {
+function ProgressBox({ progress, handleProgressChange, handleSubmit }) {
   return (
     <div className="flex flex-col gap-[6px] w-full text-text">
       <div className="font-semibold">Progress %</div>
@@ -101,6 +104,8 @@ function ProgressBox({ handleSubmit }) {
         <input
           autoComplete="off"
           type="number"
+          value={progress}
+          onChange={handleProgressChange}
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
           min="0"
           max="100"
@@ -119,6 +124,8 @@ function DivOne({
   rating,
   handleRatingChange,
   handleSubmit,
+  watchedEp,
+  handleEpisodesWatchedChange,
 }) {
   if (
     currentSection === "animes" ||
@@ -141,7 +148,11 @@ function DivOne({
           handleRatingChange={handleRatingChange}
           handleSubmit={handleSubmit}
         />
-        <ProgressBox handleSubmit={handleSubmit} />
+        <ProgressBox
+          progress={watchedEp}
+          handleProgressChange={handleEpisodesWatchedChange}
+          handleSubmit={handleSubmit}
+        />
       </div>
     );
   } else {
@@ -225,6 +236,9 @@ export default function EditAnimeModal({
   const mangaStore = useMangaStore();
   const showsStore = useShowsStore();
   const comicsStore = useComicsStore();
+  const bookStore = useBookStore();
+  const gameStore = useGameStore();
+  const movieStore = useMovieStore();
 
   // Get the correct store and functions based on section
   const getStoreFunctions = (section) => {
@@ -256,6 +270,27 @@ export default function EditAnimeModal({
           editEntry: comicsStore.editEntry,
           deleteEntry: comicsStore.deleteEntry,
           preFetchCache: comicsStore.preFetchCache,
+        };
+      case "books":
+        return {
+          createEntry: bookStore.createEntry,
+          editEntry: bookStore.editEntry,
+          deleteEntry: bookStore.deleteEntry,
+          preFetchCache: bookStore.preFetchCache,
+        };
+      case "games":
+        return {
+          createEntry: gameStore.createEntry,
+          editEntry: gameStore.editEntry,
+          deleteEntry: gameStore.deleteEntry,
+          preFetchCache: gameStore.preFetchCache,
+        };
+      case "movies":
+        return {
+          createEntry: movieStore.createEntry,
+          editEntry: movieStore.editEntry,
+          deleteEntry: movieStore.deleteEntry,
+          preFetchCache: movieStore.preFetchCache,
         };
       default:
         return {
@@ -301,28 +336,23 @@ export default function EditAnimeModal({
   } = modalData || {};
 
   // Get the correct values based on media type (check new standardized fields first)
-  const totalCount =
-    modalData?.released ||
-    modalData?.[mediaConfig.releasedField] ||
-    episodesTotal ||
-    0;
-  const mediaStatus =
-    modalData?.status ||
-    modalData?.[mediaConfig.statusField] ||
-    animeStatus ||
-    "Unknown";
+  const totalCount = modalData?.released || episodesTotal || 0;
+  const mediaStatus = modalData?.status || animeStatus || "Unknown";
 
   // Pre-fill form when editing existing entry
   useEffect(() => {
     if (isEditing && editingEntry) {
       setSelectedStatus(editingEntry.yourStatus || "Planned");
-      // Check for standardized field first, then legacy field names
-      const watchedValue =
-        editingEntry.consumed ||
-        editingEntry[mediaConfig.consumedField] ||
-        editingEntry[mediaConfig.watchedField] ||
-        editingEntry.episodesWatched ||
-        0;
+      // Get the correct consumed/progress value based on media type
+      let watchedValue = 0;
+      if (mediaConfig.consumedField === "progress") {
+        watchedValue = editingEntry.progress || 0;
+      } else if (mediaConfig.consumedField === "consumed") {
+        watchedValue = editingEntry.consumed || 0;
+      } else {
+        // Fallback for legacy field names
+        watchedValue = editingEntry[mediaConfig.consumedField] || 0;
+      }
       setWatchedEp(watchedValue.toString());
       setRating(editingEntry.rating?.toString() || "0");
     } else {
@@ -460,12 +490,21 @@ export default function EditAnimeModal({
     }
 
     try {
+      // Prepare media data with correct field mapping
       const mediaData = {
         ...modalData,
         yourStatus: selectedStatus,
-        consumed: parseInt(watchedEp) || 0, // Use standardized field name
         rating: parseFloat(rating) || 0,
       };
+
+      // Map the progress field based on media type
+      if (mediaConfig.consumedField === "progress") {
+        // For games - use progress field (0-100%)
+        mediaData.progress = parseInt(watchedEp) || 0;
+      } else if (mediaConfig.consumedField === "consumed") {
+        // For books and other media - use consumed field
+        mediaData.consumed = parseInt(watchedEp) || 0;
+      }
 
       if (isEditing) {
         await editEntry(editingEntry._id, mediaData);
@@ -535,6 +574,8 @@ export default function EditAnimeModal({
                 rating={rating}
                 handleRatingChange={handleRatingChange}
                 handleSubmit={handleSubmit}
+                watchedEp={watchedEp}
+                handleEpisodesWatchedChange={handleEpisodesWatchedChange}
               />
 
               {/* YourStatus Bar */}

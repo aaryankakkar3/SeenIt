@@ -7,9 +7,18 @@ const mediaConfig = {
   name: "Movie",
 };
 
-const { getCachedMedia } = createCacheService(MovieCache, mediaConfig);
+const { getCachedMedia, cacheMediaFromSearch } = createCacheService(
+  MovieCache,
+  mediaConfig
+);
 
 const { getAllEntries, createEntry, updateEntry, deleteEntry } =
-  createMediaController(MovieEntry, MovieCache, getCachedMedia, mediaConfig);
+  createMediaController(
+    MovieEntry,
+    MovieCache,
+    getCachedMedia,
+    cacheMediaFromSearch,
+    mediaConfig
+  );
 
 export { getAllEntries, createEntry, updateEntry, deleteEntry };

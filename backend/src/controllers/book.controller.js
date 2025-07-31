@@ -11,7 +11,10 @@ const mediaConfig = {
   watchedLabel: "Pages Read",
 };
 
-const { getCachedMedia } = createCacheService(BookCache, mediaConfig);
+const { getCachedMedia, cacheMediaFromSearch } = createCacheService(
+  BookCache,
+  mediaConfig
+);
 
 const {
   getAllEntries,
@@ -20,7 +23,13 @@ const {
   deleteEntry,
   incrementProgress,
   decrementProgress,
-} = createMediaController(BookEntry, BookCache, getCachedMedia, mediaConfig);
+} = createMediaController(
+  BookEntry,
+  BookCache,
+  getCachedMedia,
+  cacheMediaFromSearch,
+  mediaConfig
+);
 
 export {
   getAllEntries,

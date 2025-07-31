@@ -134,6 +134,23 @@ export const createCacheService = (CacheModel, mediaConfig) => {
           released: comic.count_of_issues || 0,
           status: comicStatus,
         };
+      } else if (
+        mediaConfig.name === "Movie" ||
+        mediaConfig.name === "Game" ||
+        mediaConfig.name === "Book"
+      ) {
+        // For Movies, Games, and Books, we don't fetch additional data from APIs
+        // Instead, we create cache entries from the search results data
+        // This should not be called - cache should be created when entries are made
+        return {
+          jikanId: jikanId,
+          title: "Unknown Title",
+          year: 0,
+          imageUrl: "https://placehold.co/90x129",
+          lastUpdated: new Date(),
+          released: 0,
+          status: "Unknown",
+        };
       } else {
         throw new Error(`Unsupported media type: ${mediaConfig.name}`);
       }

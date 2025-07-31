@@ -67,6 +67,12 @@ export const createMediaStore = (mediaConfig) => {
     },
 
     incrementProgress: async (entryId) => {
+      // Only attempt increment if the media type supports it
+      if (!mediaConfig.consumedField) {
+        console.warn(`Increment not supported for ${mediaConfig.name}`);
+        return;
+      }
+
       try {
         const response = await axiosInstance.put(
           `${mediaConfig.apiEndpoint}/${entryId}/increment`
@@ -89,6 +95,12 @@ export const createMediaStore = (mediaConfig) => {
     },
 
     decrementProgress: async (entryId) => {
+      // Only attempt decrement if the media type supports it
+      if (!mediaConfig.consumedField) {
+        console.warn(`Decrement not supported for ${mediaConfig.name}`);
+        return;
+      }
+
       try {
         const response = await axiosInstance.put(
           `${mediaConfig.apiEndpoint}/${entryId}/decrement`

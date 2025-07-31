@@ -12,7 +12,10 @@ const mediaConfig = {
   watchedLabel: "Chapters Read",
 };
 
-const { getCachedMedia } = createCacheService(MangaCache, mediaConfig);
+const { getCachedMedia, cacheMediaFromSearch } = createCacheService(
+  MangaCache,
+  mediaConfig
+);
 
 const {
   getAllEntries,
@@ -21,7 +24,13 @@ const {
   deleteEntry,
   incrementProgress,
   decrementProgress,
-} = createMediaController(MangaEntry, MangaCache, getCachedMedia, mediaConfig);
+} = createMediaController(
+  MangaEntry,
+  MangaCache,
+  getCachedMedia,
+  cacheMediaFromSearch,
+  mediaConfig
+);
 
 export {
   getAllEntries,

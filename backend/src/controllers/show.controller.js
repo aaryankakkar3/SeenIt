@@ -12,7 +12,10 @@ const mediaConfig = {
   watchedLabel: "Episodes Watched",
 };
 
-const { getCachedMedia } = createCacheService(ShowCache, mediaConfig);
+const { getCachedMedia, cacheMediaFromSearch } = createCacheService(
+  ShowCache,
+  mediaConfig
+);
 
 const {
   getAllEntries,
@@ -22,7 +25,13 @@ const {
   incrementProgress,
   decrementProgress,
   preFetchCache,
-} = createMediaController(ShowEntry, ShowCache, getCachedMedia, mediaConfig);
+} = createMediaController(
+  ShowEntry,
+  ShowCache,
+  getCachedMedia,
+  cacheMediaFromSearch,
+  mediaConfig
+);
 
 export {
   getAllEntries,
