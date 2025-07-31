@@ -39,6 +39,12 @@ export default function Card({
     consumed || entry[mediaConfig.consumedField] || episodesWatched || 0;
   const totalCount =
     released || entry[mediaConfig.releasedField] || episodesTotal || 0;
+
+  // Determine if this is a new media type that doesn't show status and increment/decrement
+  const isNewMediaType = ["Movies", "Games", "Books"].includes(
+    mediaConfig.name
+  );
+
   const maxStars = 5;
   const filledStars = Math.floor(rating);
   const stars = Array.from({ length: maxStars }, (_, i) => (
@@ -83,7 +89,7 @@ export default function Card({
           </div>
           <div className="text-textmuted text-p2 flex flex-row gap-[12px]">
             <div className="">{year}</div>
-            <div className="">{mediaStatus}</div>
+            {!isNewMediaType && <div className="">{mediaStatus}</div>}
           </div>
         </div>
         <div className="flex flex-col gap-[4px] ">
@@ -98,23 +104,37 @@ export default function Card({
             {yourStatus}
           </div>
           <div className="flex flex-row gap-[8px]">
-            <div className="text-text">
-              {watchedCount}/{totalCount}
-            </div>
-            <div className="flex flex-row gap-[4px]">
-              <button
-                onClick={() => onIncrement(_id)}
-                className="text-textmuted border border-gray-500 w-[24px] h-[24px] flex justify-center items-center cursor-pointer hover:bg-textmuted hover:text-medium"
-              >
-                <Plus size={16} />
-              </button>
-              <button
-                onClick={() => onDecrement(_id)}
-                className="text-textmuted border border-gray-500 w-[24px] h-[24px] flex justify-center items-center cursor-pointer hover:bg-textmuted hover:text-medium"
-              >
-                <Minus size={16} />
-              </button>
-            </div>
+            {isNewMediaType ? (
+              // For Movies, Games, Books - show progress without increment/decrement buttons
+              <div className="text-text">
+                {mediaConfig.name === "Games"
+                  ? `${watchedCount}%`
+                  : mediaConfig.name === "Movies"
+                  ? "Watched"
+                  : `${watchedCount}/${totalCount}`}
+              </div>
+            ) : (
+              // For Anime, Manga, Shows, Comics - show progress with increment/decrement buttons
+              <>
+                <div className="text-text">
+                  {watchedCount}/{totalCount}
+                </div>
+                <div className="flex flex-row gap-[4px]">
+                  <button
+                    onClick={() => onIncrement(_id)}
+                    className="text-textmuted border border-gray-500 w-[24px] h-[24px] flex justify-center items-center cursor-pointer hover:bg-textmuted hover:text-medium"
+                  >
+                    <Plus size={16} />
+                  </button>
+                  <button
+                    onClick={() => onDecrement(_id)}
+                    className="text-textmuted border border-gray-500 w-[24px] h-[24px] flex justify-center items-center cursor-pointer hover:bg-textmuted hover:text-medium"
+                  >
+                    <Minus size={16} />
+                  </button>
+                </div>
+              </>
+            )}
           </div>
           <div className="flex flex-rwo justify-between">
             <button

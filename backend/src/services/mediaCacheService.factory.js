@@ -1,5 +1,10 @@
 // Generic cache service factory
 export const createCacheService = (CacheModel, mediaConfig) => {
+  console.log(
+    `[CacheServiceFactory] Creating cache service for ${mediaConfig.name} with model:`,
+    CacheModel.modelName
+  );
+
   // Check if cache is fresh (less than 24 hours old)
   const isCacheFresh = (lastUpdated) => {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -175,18 +180,35 @@ export const createCacheService = (CacheModel, mediaConfig) => {
       );
 
       // First, try to get from cache
+      console.log(
+        `[${mediaConfig.name}CacheService] Querying database for jikanId:`,
+        jikanId
+      );
       let cachedData = await CacheModel.findOne({ jikanId });
+      console.log(
+        `[${mediaConfig.name}CacheService] Database query result:`,
+        cachedData ? "Found existing cache" : "No cache found"
+      );
+
+      // Check if this is a static media type that never needs updates
+      const isStaticMediaType = ["Movie", "Game", "Book"].includes(
+        mediaConfig.name
+      );
 
       // If not cached, cache is stale, or status is Unknown for comics, fetch from API
+      // BUT: Never refresh static media types once they're cached
       const shouldRefresh =
         !cachedData ||
-        !isCacheFresh(cachedData.lastUpdated) ||
-        (mediaConfig.name === "Comics" && cachedData.status === "Unknown");
+        (!isStaticMediaType &&
+          (!isCacheFresh(cachedData.lastUpdated) ||
+            (mediaConfig.name === "Comics" &&
+              cachedData.status === "Unknown")));
 
       console.log(
         `[${mediaConfig.name}CacheService] Cache check for jikanId ${jikanId}:`,
         {
           mediaConfigName: mediaConfig.name,
+          isStaticMediaType,
           hasCachedData: !!cachedData,
           cachedStatus: cachedData?.status,
           isFresh: cachedData ? isCacheFresh(cachedData.lastUpdated) : "N/A",
@@ -230,6 +252,10 @@ export const createCacheService = (CacheModel, mediaConfig) => {
         }
       }
 
+      console.log(
+        `[${mediaConfig.name}CacheService] Successfully returning cached data for jikanId ${jikanId}:`,
+        JSON.stringify(cachedData, null, 2)
+      );
       return cachedData;
     } catch (error) {
       console.error(
@@ -243,18 +269,51 @@ export const createCacheService = (CacheModel, mediaConfig) => {
   // Cache data from search results
   const cacheMediaFromSearch = async (searchResult) => {
     try {
+      console.log(
+        `[${mediaConfig.name}CacheService] cacheMediaFromSearch called with:`,
+        JSON.stringify(searchResult, null, 2)
+      );
+
       const jikanId = searchResult.jikanId || searchResult.mal_id;
+      console.log(
+        `[${mediaConfig.name}CacheService] Extracted jikanId:`,
+        jikanId
+      );
 
       if (!jikanId) {
+        console.error(
+          `[${mediaConfig.name}CacheService] ERROR: No jikanId found in search result:`,
+          JSON.stringify(searchResult, null, 2)
+        );
         throw new Error("No jikanId found in search result");
       }
 
       // Check if already cached and fresh
+      console.log(
+        `[${mediaConfig.name}CacheService] Checking for existing cache for jikanId:`,
+        jikanId
+      );
       const existingCache = await CacheModel.findOne({ jikanId });
-      if (existingCache && isCacheFresh(existingCache.lastUpdated)) {
-        return existingCache;
+      console.log(
+        `[${mediaConfig.name}CacheService] Existing cache found:`,
+        !!existingCache
+      );
+
+      if (existingCache) {
+        const isFresh = isCacheFresh(existingCache.lastUpdated);
+        console.log(
+          `[${mediaConfig.name}CacheService] Cache is fresh:`,
+          isFresh
+        );
+        if (isFresh) {
+          console.log(
+            `[${mediaConfig.name}CacheService] Returning existing fresh cache`
+          );
+          return existingCache;
+        }
       }
 
+      console.log(`[${mediaConfig.name}CacheService] Creating new cache entry`);
       // Transform search result data to match the cache schema
       const cacheData = {
         jikanId,
@@ -266,6 +325,10 @@ export const createCacheService = (CacheModel, mediaConfig) => {
           "https://placehold.co/90x129",
         lastUpdated: new Date(),
       };
+      console.log(
+        `[${mediaConfig.name}CacheService] Base cache data prepared:`,
+        JSON.stringify(cacheData, null, 2)
+      );
 
       // Add media-specific fields using standardized names
       cacheData.released =
@@ -283,20 +346,49 @@ export const createCacheService = (CacheModel, mediaConfig) => {
         searchResult.comicStatus ||
         "Unknown";
 
+      console.log(
+        `[${mediaConfig.name}CacheService] Final cache data with media-specific fields:`,
+        JSON.stringify(cacheData, null, 2)
+      );
+
       if (existingCache) {
         // Update existing
-        return await CacheModel.findOneAndUpdate({ jikanId }, cacheData, {
-          new: true,
-        });
+        console.log(
+          `[${mediaConfig.name}CacheService] Updating existing cache entry`
+        );
+        const updatedCache = await CacheModel.findOneAndUpdate(
+          { jikanId },
+          cacheData,
+          {
+            new: true,
+          }
+        );
+        console.log(
+          `[${mediaConfig.name}CacheService] Cache updated successfully:`,
+          JSON.stringify(updatedCache, null, 2)
+        );
+        return updatedCache;
       } else {
         // Create new
+        console.log(
+          `[${mediaConfig.name}CacheService] Creating new cache entry in database`
+        );
         const newCache = new CacheModel(cacheData);
-        return await newCache.save();
+        const savedCache = await newCache.save();
+        console.log(
+          `[${mediaConfig.name}CacheService] Cache created successfully:`,
+          JSON.stringify(savedCache, null, 2)
+        );
+        return savedCache;
       }
     } catch (error) {
       console.error(
-        `Error caching ${mediaConfig.name.toLowerCase()} from search:`,
+        `[${mediaConfig.name}CacheService] ERROR in cacheMediaFromSearch:`,
         error
+      );
+      console.error(
+        `[${mediaConfig.name}CacheService] ERROR details - searchResult:`,
+        JSON.stringify(searchResult, null, 2)
       );
       throw error;
     }

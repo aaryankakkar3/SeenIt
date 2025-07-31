@@ -14,6 +14,10 @@ const { getCachedMedia, cacheMediaFromSearch } = createCacheService(
   mediaConfig
 );
 
+console.log(
+  `[GameController] Cache service initialized for ${mediaConfig.name}`
+);
+
 const { getAllEntries, createEntry, updateEntry, deleteEntry } =
   createMediaController(
     GameEntry,
@@ -22,5 +26,9 @@ const { getAllEntries, createEntry, updateEntry, deleteEntry } =
     cacheMediaFromSearch,
     mediaConfig
   );
+
+console.log(
+  `[GameController] Media controller initialized for ${mediaConfig.name}`
+);
 
 export { getAllEntries, createEntry, updateEntry, deleteEntry };

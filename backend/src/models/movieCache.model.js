@@ -34,6 +34,36 @@ const movieCacheSchema = new mongoose.Schema(
 // Index for efficient queries by jikanId and lastUpdated
 movieCacheSchema.index({ jikanId: 1, lastUpdated: 1 });
 
+// Add pre-save logging
+movieCacheSchema.pre("save", function (next) {
+  console.log(
+    `[MovieCache] Pre-save hook - attempting to save cache with jikanId:`,
+    this.jikanId,
+    "title:",
+    this.title
+  );
+  next();
+});
+
+// Add post-save logging
+movieCacheSchema.post("save", function (doc) {
+  console.log(
+    `[MovieCache] Post-save hook - successfully saved cache:`,
+    JSON.stringify(doc, null, 2)
+  );
+});
+
+// Add save error logging
+movieCacheSchema.post("save", function (error, doc, next) {
+  if (error) {
+    console.error(
+      `[MovieCache] Save error for jikanId ${doc?.jikanId}:`,
+      error
+    );
+  }
+  next();
+});
+
 const MovieCache = mongoose.model("MovieCache", movieCacheSchema);
 
 export default MovieCache;

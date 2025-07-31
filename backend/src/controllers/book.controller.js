@@ -16,6 +16,10 @@ const { getCachedMedia, cacheMediaFromSearch } = createCacheService(
   mediaConfig
 );
 
+console.log(
+  `[BookController] Cache service initialized for ${mediaConfig.name}`
+);
+
 const {
   getAllEntries,
   createEntry,
@@ -29,6 +33,10 @@ const {
   getCachedMedia,
   cacheMediaFromSearch,
   mediaConfig
+);
+
+console.log(
+  `[BookController] Media controller initialized for ${mediaConfig.name}`
 );
 
 export {
