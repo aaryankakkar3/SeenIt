@@ -57,12 +57,11 @@ export const MEDIA_TYPES = {
     name: "Books",
     displayName: "Books",
     // Internal field names (standardized)
-    statusField: "status",
-    releasedField: "total",
-    consumedField: "read",
+    releasedField: "released", // total pages from backend
+    consumedField: "consumed", // pages read from backend
     // Display labels (what users see)
-    releasedLabel: "Pgs",
-    consumedLabel: "Pgs Read",
+    releasedLabel: "Pages",
+    consumedLabel: "Pages Read",
     addButtonText: "Add Book",
     apiEndpoint: "/books",
   },
@@ -70,7 +69,9 @@ export const MEDIA_TYPES = {
     name: "Games",
     displayName: "Games",
     // Internal field names (standardized)
-    statusField: "status",
+    consumedField: "progress", // progress percentage from backend
+    // Display labels (what users see)
+    consumedLabel: "Progress",
     addButtonText: "Add Game",
     apiEndpoint: "/games",
   },
@@ -78,7 +79,6 @@ export const MEDIA_TYPES = {
     name: "Movies",
     displayName: "Movies",
     // Internal field names (standardized)
-    statusField: "status",
     addButtonText: "Add Movie",
     apiEndpoint: "/movies",
   },
