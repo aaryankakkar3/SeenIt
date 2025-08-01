@@ -54,6 +54,16 @@ const userSchema = new mongoose.Schema(
           "Sections can only contain: animes, manga, shows, comics, movies, books, games",
       },
     },
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+    },
+    verificationTokenExpiry: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );

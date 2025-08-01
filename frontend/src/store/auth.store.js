@@ -34,12 +34,15 @@ export const useAuthStore = create((set) => ({
     try {
       set({ isSigningUp: true });
       const res = await axiosInstance.post("/auth/signup", data);
-      set({
-        authUser: res.data,
-      });
-      toast.success("Account created successfully");
+      // Don't set authUser since user needs to verify email first
+      toast.success(
+        res.data.message ||
+          "Account created successfully! Please check your email to verify your account."
+      );
+      return { success: true, needsVerification: true };
     } catch (error) {
       toast.error(error.response.data.message);
+      return { success: false, error: error.response.data.message };
     } finally {
       set({ isSigningUp: false });
     }
@@ -83,11 +86,47 @@ export const useAuthStore = create((set) => ({
         isSignUp ? "Account created successfully" : "Logged in successfully"
       );
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Google authentication failed"
-      );
+      const errorData = error.response?.data;
+
+      // Handle email verification requirement for Google sign-in
+      if (!isSignUp && errorData?.requiresVerification) {
+        toast.error(
+          errorData.message ||
+            "Please verify your email address before signing in."
+        );
+      } else {
+        toast.error(errorData?.message || "Google authentication failed");
+      }
     } finally {
       set({ isGoogleLoading: false });
+    }
+  },
+
+  verifyEmail: async (token) => {
+    try {
+      const res = await axiosInstance.get(`/auth/verify-email?token=${token}`);
+      // Don't show toast here - let the VerifyEmail component handle UI feedback
+      return { success: true };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Email verification failed";
+      // Don't show toast here - let the VerifyEmail component handle UI feedback
+      return { success: false, error: errorMessage };
+    }
+  },
+
+  resendVerificationEmail: async (email) => {
+    try {
+      const res = await axiosInstance.post("/auth/resend-verification", {
+        email,
+      });
+      toast.success(res.data.message || "Verification email sent!");
+      return { success: true };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to send verification email";
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
     }
   },
 }));

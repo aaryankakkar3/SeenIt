@@ -4,6 +4,7 @@ import SignIn from "./pages/SignIn";
 import MyList from "./pages/MyList";
 import AI from "./pages/AI";
 import SignUp from "./pages/SignUp";
+import VerifyEmail from "./pages/VerifyEmail";
 import { useAuthStore } from "./store/auth.store";
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
@@ -92,6 +93,7 @@ function App() {
           path="/login"
           element={!authUser ? <SignIn /> : <Navigate to={"/"} />}
         ></Route>
+        <Route path="/verify-email" element={<VerifyEmail />}></Route>
       </Routes>
     </div>
   );

@@ -1,6 +1,8 @@
 import { generateToken } from "../lib/utils.js";
+import { sendVerificationEmail } from "../lib/email.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -41,22 +43,40 @@ export const signup = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
     const newUser = new User({
       fullName,
       email,
       password: hashedPassword,
+      verified: false,
+      verificationToken,
+      verificationTokenExpiry,
     });
 
     if (newUser) {
-      // generate jwt token here
-      generateToken(newUser._id, res);
       await newUser.save();
 
+      // Send verification email
+      try {
+        await sendVerificationEmail(email, verificationToken);
+        console.log(`Verification email sent to ${email}`);
+      } catch (emailError) {
+        console.error("Failed to send verification email:", emailError);
+        // Don't fail the signup if email fails, but log it
+      }
+
       res.status(201).json({
+        message:
+          "Account created successfully! Please check your email to verify your account.",
         _id: newUser._id,
         fullName: newUser.fullName,
         email: newUser.email,
         profilePic: newUser.profilePic,
+        verified: newUser.verified,
       });
     } else {
       res.status(400).json({ message: "Invalid User Data" });
@@ -101,12 +121,22 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Check if email is verified
+    if (!user.verified) {
+      return res.status(400).json({
+        message:
+          "Please verify your email first. Check your inbox for the verification link.",
+        needsVerification: true,
+      });
+    }
+
     generateToken(user._id, res);
     res.status(200).json({
       _id: user._id,
       fullName: user.fullName,
       email: user.email,
       profilePic: user.profilePic,
+      verified: user.verified,
     });
   } catch (error) {
     console.log("Error in login controller", error.message);
@@ -119,6 +149,116 @@ export const logout = (req, res) => {
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.log("Error in logout controller", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const verifyEmail = async (req, res) => {
+  try {
+    console.log("verifyEmail controller called with token:", req.query.token);
+    const { token } = req.query;
+
+    if (!token) {
+      console.log("No token provided");
+      return res
+        .status(400)
+        .json({ message: "Verification token is required" });
+    }
+
+    console.log("Looking for user with token:", token);
+    // Find user with the verification token
+    const user = await User.findOne({
+      verificationToken: token,
+      verificationTokenExpiry: { $gt: new Date() }, // Check if token hasn't expired
+    });
+
+    console.log("User found:", user ? "Yes" : "No");
+    if (!user) {
+      console.log("Checking if user was already verified...");
+
+      // Check if this is a duplicate request after successful verification
+      // We can't directly check by token since it's cleared, but we can be more helpful
+      const recentlyVerifiedUser = await User.findOne({
+        verified: true,
+        verificationToken: { $exists: false },
+      }).sort({ updatedAt: -1 });
+
+      if (recentlyVerifiedUser) {
+        console.log("Found recently verified user, likely duplicate request");
+        // Return success for duplicate verification attempts
+        return res.status(200).json({
+          message:
+            "Email is already verified! You can now log in to your account.",
+          verified: true,
+        });
+      }
+
+      console.log("Invalid or expired token");
+      return res.status(400).json({
+        message:
+          "Invalid or expired verification token. Please request a new verification email.",
+      });
+    }
+
+    console.log("Updating user verification status");
+    // Update user to verified and clear verification fields
+    user.verified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiry = undefined;
+    await user.save();
+
+    console.log("User verification completed successfully");
+    res.status(200).json({
+      message:
+        "Email verified successfully! You can now log in to your account.",
+      verified: true,
+    });
+  } catch (error) {
+    console.log("Error in verifyEmail controller", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const resendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    if (user.verified) {
+      return res.status(400).json({ message: "Email is already verified" });
+    }
+
+    // Generate new verification token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpiry = verificationTokenExpiry;
+    await user.save();
+
+    // Send verification email
+    try {
+      await sendVerificationEmail(email, verificationToken);
+      res.status(200).json({
+        message:
+          "Verification email sent successfully! Please check your inbox.",
+      });
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+      res.status(500).json({
+        message: "Failed to send verification email. Please try again.",
+      });
+    }
+  } catch (error) {
+    console.log("Error in resendVerificationEmail controller", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -151,6 +291,15 @@ export const googleSignIn = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         message: "No account found with this email. Please sign up first.",
+      });
+    }
+
+    // Check if user's email is verified
+    if (!user.verified) {
+      return res.status(400).json({
+        message:
+          "Please verify your email address before signing in. Check your inbox for a verification link.",
+        requiresVerification: true,
       });
     }
 
@@ -205,6 +354,7 @@ export const googleSignUp = async (req, res) => {
       email,
       password: await bcrypt.hash(googleId, 10), // Use Google ID as password hash
       profilePic: picture,
+      verified: true, // Google accounts are pre-verified
     });
 
     await newUser.save();
