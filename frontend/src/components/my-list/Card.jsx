@@ -71,11 +71,11 @@ export default function Card({
     statusBorder = "";
   } else if (yourStatus === "Completed") {
     statusBg = "#FF0048";
-    statusText = "text-[#000000]";
+    statusText = "text-[#f2f2f2]";
     statusBorder = "";
   } else if (yourStatus === "Dropped") {
     statusBg = "#fff";
-    statusText = "text-[#f2f2f2]";
+    statusText = "text-[#000000]";
     statusBorder = "border border-white";
   }
 

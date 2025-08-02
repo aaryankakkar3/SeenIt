@@ -34,6 +34,7 @@ export const useAuthStore = create((set) => ({
     try {
       set({ isSigningUp: true });
       const res = await axiosInstance.post("/auth/signup", data);
+
       // Don't set authUser since user needs to verify email first
       toast.success(
         res.data.message ||
@@ -47,23 +48,24 @@ export const useAuthStore = create((set) => ({
       set({ isSigningUp: false });
     }
   },
-
   login: async (data) => {
     try {
       console.log("useAuthStore reached with data :");
       set({ isLoggingIn: true });
       const res = await axiosInstance.post("/auth/login", data);
+
       set({
         authUser: res.data,
       });
       toast.success("Logged in successfully");
+      return { success: true, user: res.data };
     } catch (error) {
       toast.error(error.response.data.message);
+      throw error; // Re-throw so the component can catch it
     } finally {
       set({ isLoggingIn: false });
     }
   },
-
   logout: async (data) => {
     try {
       await axiosInstance.post("/auth/logout");

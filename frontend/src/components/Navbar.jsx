@@ -32,7 +32,7 @@ function Navbar() {
           }`}
           onClick={() => navigate("/ai")}
         >
-          AI
+          AI Suggestions
         </div>
         <div
           className={`hover:underline cursor-pointer ${
