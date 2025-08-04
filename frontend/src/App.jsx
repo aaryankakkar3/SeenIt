@@ -8,6 +8,8 @@ import VerifyEmail from "./pages/VerifyEmail";
 import { useAuthStore } from "./store/auth.store";
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
+import ForgotPassword from "./pages/ForgotPassword";
+import HelpSigningIn from "./pages/HelpSigningIn";
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -88,6 +90,14 @@ function App() {
         <Route
           path="/signup"
           element={!authUser ? <SignUp /> : <Navigate to={"/"} />}
+        ></Route>
+        <Route
+          path="/forgotpassword"
+          element={!authUser ? <ForgotPassword /> : <Navigate to={"/"} />}
+        ></Route>
+        <Route
+          path="/help"
+          element={!authUser ? <HelpSigningIn /> : <Navigate to={"/"} />}
         ></Route>
         <Route
           path="/login"
