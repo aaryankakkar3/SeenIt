@@ -196,8 +196,9 @@ function SignIn() {
           <button
             type="button"
             className="h-[32px] w-[100%] text-textmuted flex justify-end hover:underline cursor-pointer"
+            onClick={() => (window.location.href = "/help-signin")}
           >
-            Forgot Password?
+            Need help signing in?
           </button>
 
           <button

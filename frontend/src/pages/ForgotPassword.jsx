@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { FaGoogle } from "react-icons/fa";
-import { GoogleLogin } from "@react-oauth/google";
 import Dither from "../components/react-components/Dither";
 import { useAuthStore } from "../store/auth.store";
 import { toast } from "react-hot-toast";
@@ -9,12 +7,10 @@ import { toast } from "react-hot-toast";
 function ForgotPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
     password: "",
   });
-  const { login, isLoggingIn, googleAuth, isGoogleLoading } = useAuthStore();
-
-  const [shouldTriggerSave, setShouldTriggerSave] = useState(false);
+  const [token, setToken] = useState("");
+  const { resetPassword, isResettingPassword } = useAuthStore();
 
   // Add custom CSS to override autofill styles
   useEffect(() => {
@@ -63,23 +59,21 @@ function ForgotPassword() {
     };
   }, []);
 
-  const handleGoogleSuccess = (credentialResponse) => {
-    console.log("Google auth started, isGoogleLoading:", isGoogleLoading);
-    googleAuth(credentialResponse.credential, false);
-  };
+  useEffect(() => {
+    // Get token from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const resetToken = urlParams.get("token");
 
-  const handleGoogleError = () => {
-    toast.error("Google sign in failed");
-  };
-
-  const validateForm = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
-      return false;
+    if (!resetToken) {
+      toast.error("Invalid or missing reset token");
+      window.location.href = "/help-signin";
+      return;
     }
 
+    setToken(resetToken);
+  }, []);
+
+  const validateForm = () => {
     if (formData.password.length < 8) {
       toast.error("Password must be at least 8 characters long");
       return false;
@@ -92,41 +86,23 @@ function ForgotPassword() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const credentials = {
-      email: formData.email,
-      password: formData.password,
-    };
+    if (!token) {
+      toast.error("Invalid reset token");
+      return;
+    }
 
     try {
-      await login(credentials);
-      setShouldTriggerSave(true);
+      const result = await resetPassword(token, formData.password);
+      if (result.success) {
+        // Redirect to sign in page after successful reset
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 2000);
+      }
     } catch (error) {
-      console.log("Login failed");
+      console.log("Password reset failed");
     }
   };
-
-  // Effect to trigger password save after successful login
-  useEffect(() => {
-    if (shouldTriggerSave) {
-      // Reset the flag
-      setShouldTriggerSave(false);
-
-      // Try to trigger the browser's password save prompt
-      if (navigator.credentials && window.PasswordCredential) {
-        try {
-          // Create a credential object
-          const cred = new window.PasswordCredential({
-            id: formData.email,
-            password: formData.password,
-            name: formData.email,
-          });
-          navigator.credentials.store(cred);
-        } catch (error) {
-          console.log("Could not store credentials:", error);
-        }
-      }
-    }
-  }, [shouldTriggerSave, formData.email, formData.password]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -151,7 +127,7 @@ function ForgotPassword() {
         </div>
       </div>
       <div className="w-[50%] flex flex-col items-center justify-center gap-[24px] text-p1 p-[64px]">
-        <div className="text-h1">Forgot Password</div>
+        <div className="text-h1">Reset Password</div>
         <form
           onSubmit={handleSubmit}
           className="flex flex-col w-[100%] gap-[16px]"
@@ -159,11 +135,11 @@ function ForgotPassword() {
         >
           <div className="w-[100%] h-[52px] bg-medium flex flex-row px-[30px]">
             <input
-              autoComplete="current-password"
+              autoComplete="new-password"
               type={showPassword ? "text" : "password"}
               id="password"
               name="password"
-              placeholder="Password"
+              placeholder="New Password"
               value={formData.password}
               onChange={handleChange}
               className="w-[100%] h-[100%] placeholder:text-textmuted focus:outline-none"
@@ -176,21 +152,21 @@ function ForgotPassword() {
               {showPassword ? (
                 <EyeOff className="text-textmuted cursor-pointer h-[24px] w-[24px]" />
               ) : (
-                <Eye className="text-textmuted  cursor-pointer h-[24px] w-[24px]" />
+                <Eye className="text-textmuted cursor-pointer h-[24px] w-[24px]" />
               )}
             </button>
           </div>
 
           <button
             type="submit"
-            disabled={isLoggingIn}
+            disabled={isResettingPassword}
             className="h-[52px] w-[100%] bg-primary flex justify-center items-center text-dark font-semibold cursor-pointer hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoggingIn ? "Resetting..." : "Reset Password"}
+            {isResettingPassword ? "Resetting..." : "Reset Password"}
           </button>
         </form>
         <div className="text-textmuted">
-          Don't need help?{" "}
+          Remember your password?{" "}
           <button
             className="text-primary hover:underline cursor-pointer"
             onClick={() => (window.location.href = "/login")}

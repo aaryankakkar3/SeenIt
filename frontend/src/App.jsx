@@ -96,7 +96,11 @@ function App() {
           element={!authUser ? <ForgotPassword /> : <Navigate to={"/"} />}
         ></Route>
         <Route
-          path="/help"
+          path="/reset-password"
+          element={!authUser ? <ForgotPassword /> : <Navigate to={"/"} />}
+        ></Route>
+        <Route
+          path="/help-signin"
           element={!authUser ? <HelpSigningIn /> : <Navigate to={"/"} />}
         ></Route>
         <Route

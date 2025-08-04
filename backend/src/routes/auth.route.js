@@ -8,6 +8,8 @@ import {
   googleSignUp,
   verifyEmail,
   resendVerificationEmail,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
@@ -19,6 +21,8 @@ router.post("/logout", logout);
 router.post("/google-signin", googleSignIn);
 router.post("/google-signup", googleSignUp);
 router.post("/resend-verification", resendVerificationEmail);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 router.get("/verify-email", verifyEmail);
 router.get("/check", protectRoute, checkAuth);

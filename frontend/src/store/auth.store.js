@@ -9,6 +9,9 @@ export const useAuthStore = create((set) => ({
   isLoggingIn: false,
   isUpdatingProfile: false,
   isGoogleLoading: false,
+  isSendingReset: false,
+  isResettingPassword: false,
+  isResendingVerification: false,
 
   isCheckingAuth: true,
 
@@ -119,6 +122,7 @@ export const useAuthStore = create((set) => ({
 
   resendVerificationEmail: async (email) => {
     try {
+      set({ isResendingVerification: true });
       const res = await axiosInstance.post("/auth/resend-verification", {
         email,
       });
@@ -129,6 +133,43 @@ export const useAuthStore = create((set) => ({
         error.response?.data?.message || "Failed to send verification email";
       toast.error(errorMessage);
       return { success: false, error: errorMessage };
+    } finally {
+      set({ isResendingVerification: false });
+    }
+  },
+
+  forgotPassword: async (email) => {
+    try {
+      set({ isSendingReset: true });
+      const res = await axiosInstance.post("/auth/forgot-password", { email });
+      toast.success(res.data.message || "Password reset email sent!");
+      return { success: true };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to send password reset email";
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      set({ isSendingReset: false });
+    }
+  },
+
+  resetPassword: async (token, newPassword) => {
+    try {
+      set({ isResettingPassword: true });
+      const res = await axiosInstance.post("/auth/reset-password", {
+        token,
+        newPassword,
+      });
+      toast.success(res.data.message || "Password reset successful!");
+      return { success: true };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to reset password";
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      set({ isResettingPassword: false });
     }
   },
 }));
