@@ -18,57 +18,84 @@ export const sendVerificationEmail = async (to, token) => {
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Verify Your Email</title>
+          <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
           <style>
             body {
               font-family: 'Roboto Mono', monospace;
-              line-height: 1.6;
-              color: #333;
+              line-height: 1.2rem;
+              color: #f2f2f2;
               max-width: 600px;
               margin: 0 auto;
               padding: 20px;
-              background-color: #f4f4f4;
+              background-color: #000000;
             }
             .container {
-              background-color: #ffffff;
+              background-color: #0d0d0d;
               padding: 30px;
               border-radius: 8px;
-              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             }
             .header {
               text-align: center;
               margin-bottom: 30px;
             }
             .header h1 {
-              color: #526020;
+              color: #c6ff01;
               margin: 0;
-              font-size: 28px;
+              font-size: 40px;
+              font-weight: 600;
+              letter-spacing: -1.5px;
             }
             .content {
               margin-bottom: 30px;
             }
+            .content h2 {
+              color: #f2f2f2;
+              font-size: 32px;
+              font-weight: 600;
+              letter-spacing: -1.5px;
+              margin: 0 0 20px 0;
+            }
+            .content p {
+              color: #f2f2f2;
+              font-size: 16px;
+              margin: 16px 0;
+            }
             .button {
               display: inline-block;
-              background-color: #526020;
-              color: #ffffff;
+              background-color: #c6ff01;
+              color: #000000;
               padding: 12px 30px;
               text-decoration: none;
               border-radius: 4px;
               font-weight: 600;
               text-align: center;
               margin: 20px 0;
+              font-size: 16px;
             }
             .button:hover {
-              background-color: #3d4818;
+              background-color: #e3ff80;
+              color: #000000;
+            }
+            .button:visited {
+              color: #000000;
             }
             .footer {
               text-align: center;
               margin-top: 30px;
               font-size: 14px;
-              color: #666;
+              color: #b2b2b2;
             }
             .link {
               word-break: break-all;
-              color: #526020;
+              color: #c6ff01;
+              text-decoration: none;
+            }
+            .link:visited {
+              color: #c6ff01;
+            }
+            .link:hover {
+              color: #e3ff80;
             }
           </style>
         </head>
@@ -86,7 +113,7 @@ export const sendVerificationEmail = async (to, token) => {
               </div>
               
               <p>If the button doesn't work, you can also copy and paste this link into your browser:</p>
-              <p class="link">${verificationUrl}</p>
+              <p><a href="${verificationUrl}" class="link">${verificationUrl}</a></p>
               
               <p><strong>Important:</strong> This verification link will expire in 1 hour for security reasons.</p>
               
@@ -133,65 +160,100 @@ export const sendPasswordResetEmail = async (to, token) => {
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Reset Your Password</title>
+          <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
           <style>
             body {
               font-family: 'Roboto Mono', monospace;
-              line-height: 1.6;
-              color: #333;
+              line-height: 1.2rem;
+              color: #f2f2f2;
               max-width: 600px;
               margin: 0 auto;
               padding: 20px;
-              background-color: #f4f4f4;
+              background-color: #000000;
             }
             .container {
-              background-color: #ffffff;
+              background-color: #0d0d0d;
               padding: 30px;
               border-radius: 8px;
-              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             }
             .header {
               text-align: center;
               margin-bottom: 30px;
             }
             .header h1 {
-              color: #526020;
+              color: #c6ff01;
               margin: 0;
-              font-size: 28px;
+              font-size: 40px;
+              font-weight: 600;
+              letter-spacing: -1.5px;
             }
             .content {
               margin-bottom: 30px;
             }
+            .content h2 {
+              color: #f2f2f2;
+              font-size: 32px;
+              font-weight: 600;
+              letter-spacing: -1.5px;
+              margin: 0 0 20px 0;
+            }
+            .content p {
+              color: #f2f2f2;
+              font-size: 16px;
+              margin: 16px 0;
+            }
             .button {
               display: inline-block;
-              background-color: #526020;
-              color: #ffffff;
+              background-color: #c6ff01;
+              color: #000000;
               padding: 12px 30px;
               text-decoration: none;
               border-radius: 4px;
               font-weight: 600;
               text-align: center;
               margin: 20px 0;
+              font-size: 16px;
             }
             .button:hover {
-              background-color: #3d4818;
+              background-color: #e3ff80;
+              color: #000000;
+            }
+            .button:visited {
+              color: #000000;
             }
             .footer {
               text-align: center;
               margin-top: 30px;
               font-size: 14px;
-              color: #666;
+              color: #b2b2b2;
             }
             .link {
               word-break: break-all;
-              color: #526020;
+              color: #c6ff01;
+              text-decoration: none;
+            }
+            .link:visited {
+              color: #c6ff01;
+            }
+            .link:hover {
+              color: #e3ff80;
             }
             .warning {
-              background-color: #fff3cd;
-              border: 1px solid #ffeaa7;
+              background-color: #1a1a1a;
+              border: 1px solid #c6ff01;
               border-radius: 4px;
               padding: 15px;
               margin: 20px 0;
-              color: #856404;
+              color: #f2f2f2;
+            }
+            .warning ul {
+              margin: 10px 0;
+              padding-left: 20px;
+            }
+            .warning li {
+              margin: 8px 0;
+              color: #f2f2f2;
             }
           </style>
         </head>
@@ -209,7 +271,7 @@ export const sendPasswordResetEmail = async (to, token) => {
               </div>
               
               <p>If the button doesn't work, you can also copy and paste this link into your browser:</p>
-              <p class="link">${resetUrl}</p>
+              <p><a href="${resetUrl}" class="link">${resetUrl}</a></p>
               
               <div class="warning">
                 <p><strong>Important Security Information:</strong></p>

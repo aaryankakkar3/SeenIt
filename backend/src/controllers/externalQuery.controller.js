@@ -8,6 +8,21 @@ export const fetchData = async (req, res) => {
     });
   }
 
+  // Check for required API keys based on media type
+  const requiredKeys = {
+    shows: process.env.TMDB_API_KEY,
+    comics: process.env.COMICVINE_API_KEY,
+    games: process.env.RAWG_API_KEY,
+    movies: process.env.OMDB_API_KEY,
+  };
+
+  if (requiredKeys[type] && !requiredKeys[type]) {
+    return res.status(500).json({
+      success: false,
+      message: `API key not configured for ${type}`,
+    });
+  }
+
   try {
     let apiUrl = "";
     let transformedResults = [];
@@ -55,7 +70,7 @@ export const fetchData = async (req, res) => {
 
       case "shows":
         // TheMovieDB API for TV shows
-        apiUrl = `https://api.themoviedb.org/3/search/tv?api_key=1b677d7d4a3baecc4648f523113e51bd&query=${encodeURIComponent(
+        apiUrl = `https://api.themoviedb.org/3/search/tv?api_key=${process.env.TMDB_API_KEY}&query=${encodeURIComponent(
           query
         )}&page=1`;
         const showsResponse = await fetch(apiUrl);
@@ -78,7 +93,7 @@ export const fetchData = async (req, res) => {
 
       case "comics":
         // ComicVine API for comics
-        apiUrl = `https://comicvine.gamespot.com/api/search/?api_key=ea0c843c1fd61fc7d1c3f59b941e61780f11d7a2&format=json&resources=volume&query=${encodeURIComponent(
+        apiUrl = `https://comicvine.gamespot.com/api/search/?api_key=${process.env.COMICVINE_API_KEY}&format=json&resources=volume&query=${encodeURIComponent(
           query
         )}&limit=20`;
         const comicsResponse = await fetch(apiUrl);
@@ -105,9 +120,10 @@ export const fetchData = async (req, res) => {
 
       case "books":
         // Google Books API
-        apiUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
+        apiUrl = `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(
           query
-        )}&maxResults=10`;
+        )}+-sketchbook+-planner+-journal+-trivia+-summary+-collection&printType=books&langRestrict=en&filter=ebooks&orderBy=relevance&maxResults=20`;
+
         const booksResponse = await fetch(apiUrl);
         const booksData = await booksResponse.json();
 
@@ -128,7 +144,7 @@ export const fetchData = async (req, res) => {
 
       case "games":
         // RAWG API for games
-        apiUrl = `https://api.rawg.io/api/games?key=023e16f4c9fe44c4b1c498ff067eb5aa&search=${encodeURIComponent(
+        apiUrl = `https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&search=${encodeURIComponent(
           query
         )}&page_size=10`;
         const gamesResponse = await fetch(apiUrl);
@@ -149,7 +165,7 @@ export const fetchData = async (req, res) => {
         // OMDB API for movies
         apiUrl = `https://www.omdbapi.com/?s=${encodeURIComponent(
           query
-        )}&apikey=5bcaca7e&type=movie&page=1`;
+        )}&apikey=${process.env.OMDB_API_KEY}&type=movie&page=1`;
         const moviesResponse = await fetch(apiUrl);
         const moviesData = await moviesResponse.json();
 
@@ -187,7 +203,3 @@ export const fetchData = async (req, res) => {
     });
   }
 };
-
-// books - https://www.googleapis.com/books/v1/volumes?q=harry+potter
-// games - https://api.rawg.io/api/games?key=023e16f4c9fe44c4b1c498ff067eb5aa&search=spider-man
-// movies https://www.omdbapi.com/?s=jurassic park&apikey=5bcaca7e&type=movie
