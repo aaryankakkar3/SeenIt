@@ -89,7 +89,7 @@ function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
       <div
         className="grid gap-[12px]"
         style={{
-          gridTemplateColumns: "repeat(auto-fit, minmax(370px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fill, minmax(370px, 1fr))",
         }}
       >
         {entries.map((entry, idx) => (
