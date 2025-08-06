@@ -1,5 +1,9 @@
-import express from "express";
 import dotenv from "dotenv";
+
+// Load environment variables FIRST before any other imports
+dotenv.config();
+
+import express from "express";
 import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -13,8 +17,7 @@ import movieRoutes from "./routes/movie.route.js";
 import authRoutes from "./routes/auth.route.js";
 import sectionsRoutes from "./routes/sections.route.js";
 import externalQueryRoutes from "./routes/externalQuery.route.js";
-
-dotenv.config();
+import openaiapiRoutes from "./routes/openaiapi.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -45,6 +48,7 @@ app.use("/api/movies", movieRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/sections", sectionsRoutes);
 app.use("/api/external", externalQueryRoutes);
+app.use("/api/openai", openaiapiRoutes);
 
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
