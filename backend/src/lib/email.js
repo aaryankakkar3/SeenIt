@@ -1,15 +1,32 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
+
+// Create transporter using Gmail SMTP
+const createTransporter = () => {
+  console.log("Creating Gmail transporter with:", {
+    user: process.env.GMAIL_EMAIL,
+    passwordSet: !!process.env.GMAIL_APP_PASSWORD,
+  });
+
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.GMAIL_EMAIL,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  });
+};
 
 export const sendVerificationEmail = async (to, token) => {
   try {
-    // Create Resend instance inside the function to ensure env vars are loaded
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const transporter = createTransporter();
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
-    const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/verify-email?token=${token}`;
-
-    const { data, error } = await resend.emails.send({
-      from: "SeenIt <onboarding@resend.dev>", // Using Resend's test domain
-      to: [to],
+    const mailOptions = {
+      from: {
+        name: "SeenIt",
+        address: process.env.GMAIL_EMAIL,
+      },
+      to: to,
       subject: "Verify Your Email Address",
       html: `
         <!DOCTYPE html>
@@ -127,31 +144,29 @@ export const sendVerificationEmail = async (to, token) => {
         </body>
         </html>
       `,
-    });
+    };
 
-    if (error) {
-      console.error("Error sending verification email:", error);
-      throw new Error("Failed to send verification email");
-    }
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Verification email sent successfully:", info.messageId);
 
-    console.log("Verification email sent successfully:", data);
-    return data;
+    return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("Error in sendVerificationEmail:", error);
-    throw error;
+    console.error("Error sending verification email:", error);
+    throw new Error("Failed to send verification email");
   }
 };
 
 export const sendPasswordResetEmail = async (to, token) => {
   try {
-    // Create Resend instance inside the function to ensure env vars are loaded
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const transporter = createTransporter();
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-    const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${token}`;
-
-    const { data, error } = await resend.emails.send({
-      from: "SeenIt <onboarding@resend.dev>", // Using Resend's test domain
-      to: [to],
+    const mailOptions = {
+      from: {
+        name: "SeenIt",
+        address: process.env.GMAIL_EMAIL,
+      },
+      to: to,
       subject: "Reset Your Password",
       html: `
         <!DOCTYPE html>
@@ -292,17 +307,14 @@ export const sendPasswordResetEmail = async (to, token) => {
         </body>
         </html>
       `,
-    });
+    };
 
-    if (error) {
-      console.error("Error sending password reset email:", error);
-      throw new Error("Failed to send password reset email");
-    }
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Password reset email sent successfully:", info.messageId);
 
-    console.log("Password reset email sent successfully:", data);
-    return data;
+    return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("Error in sendPasswordResetEmail:", error);
-    throw error;
+    console.error("Error sending password reset email:", error);
+    throw new Error("Failed to send password reset email");
   }
 };
