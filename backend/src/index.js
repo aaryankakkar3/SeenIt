@@ -19,8 +19,11 @@ import sectionsRoutes from "./routes/sections.route.js";
 import externalQueryRoutes from "./routes/externalQuery.route.js";
 import openaiapiRoutes from "./routes/openaiapi.route.js";
 
+import path from "path";
+
 const app = express();
 const PORT = process.env.PORT || 5001;
+const __dirname = path.resolve();
 
 app.use(cookieParser());
 app.use(express.json());
@@ -39,6 +42,14 @@ app.use(
     credentials: true,
   })
 );
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+  });
+}
 
 app.use("/api/anime", animeRoutes);
 app.use("/api/manga", mangaRoutes);
