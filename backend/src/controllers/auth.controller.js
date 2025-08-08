@@ -63,7 +63,7 @@ export const signup = async (req, res) => {
       // Send verification email
       try {
         await sendVerificationEmail(email, verificationToken);
-        console.log(`Verification email sent to ${email}`);
+
       } catch (emailError) {
         console.error("Failed to send verification email:", emailError);
         // Don't fail the signup if email fails, but log it
@@ -82,7 +82,7 @@ export const signup = async (req, res) => {
       res.status(400).json({ message: "Invalid User Data" });
     }
   } catch (error) {
-    console.log("Error in signup controller", error.message);
+
     // Handle mongoose validation errors
     if (error.name === "ValidationError") {
       const validationErrors = Object.values(error.errors).map(
@@ -139,7 +139,7 @@ export const login = async (req, res) => {
       verified: user.verified,
     });
   } catch (error) {
-    console.log("Error in login controller", error.message);
+
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -148,33 +148,33 @@ export const logout = (req, res) => {
     res.cookie("jwt", "", { maxAge: 0 });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    console.log("Error in logout controller", error.message);
+
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
 export const verifyEmail = async (req, res) => {
   try {
-    console.log("verifyEmail controller called with token:", req.query.token);
+
     const { token } = req.query;
 
     if (!token) {
-      console.log("No token provided");
+
       return res
         .status(400)
         .json({ message: "Verification token is required" });
     }
 
-    console.log("Looking for user with token:", token);
+
     // Find user with the verification token
     const user = await User.findOne({
       verificationToken: token,
       verificationTokenExpiry: { $gt: new Date() }, // Check if token hasn't expired
     });
 
-    console.log("User found:", user ? "Yes" : "No");
+
     if (!user) {
-      console.log("Checking if user was already verified...");
+
 
       // Check if this is a duplicate request after successful verification
       // We can't directly check by token since it's cleared, but we can be more helpful
@@ -184,7 +184,7 @@ export const verifyEmail = async (req, res) => {
       }).sort({ updatedAt: -1 });
 
       if (recentlyVerifiedUser) {
-        console.log("Found recently verified user, likely duplicate request");
+
         // Return success for duplicate verification attempts
         return res.status(200).json({
           message:
@@ -193,28 +193,28 @@ export const verifyEmail = async (req, res) => {
         });
       }
 
-      console.log("Invalid or expired token");
+
       return res.status(400).json({
         message:
           "Invalid or expired verification token. Please request a new verification email.",
       });
     }
 
-    console.log("Updating user verification status");
+
     // Update user to verified and clear verification fields
     user.verified = true;
     user.verificationToken = undefined;
     user.verificationTokenExpiry = undefined;
     await user.save();
 
-    console.log("User verification completed successfully");
+
     res.status(200).json({
       message:
         "Email verified successfully! You can now log in to your account.",
       verified: true,
     });
   } catch (error) {
-    console.log("Error in verifyEmail controller", error.message);
+
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -258,7 +258,7 @@ export const resendVerificationEmail = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log("Error in resendVerificationEmail controller", error.message);
+
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -267,7 +267,7 @@ export const checkAuth = (req, res) => {
   try {
     res.status(200).json(req.user);
   } catch (error) {
-    console.log("Error in checkAuth controller", error.message);
+
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -314,7 +314,7 @@ export const googleSignIn = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Error in Google sign in:", error.message);
+
     res.status(500).json({ message: "Google authentication failed" });
   }
 };
@@ -370,7 +370,7 @@ export const googleSignUp = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Error in Google sign up:", error.message);
+
     if (error.code === 11000) {
       res.status(400).json({ message: "Email already exists" });
     } else {
@@ -433,7 +433,7 @@ export const forgotPassword = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log("Error in forgotPassword controller", error.message);
+
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -483,7 +483,7 @@ export const resetPassword = async (req, res) => {
         "Password reset successfully! You can now log in with your new password.",
     });
   } catch (error) {
-    console.log("Error in resetPassword controller", error.message);
+
     res.status(500).json({ message: "Internal server error" });
   }
 };

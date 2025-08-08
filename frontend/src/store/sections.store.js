@@ -12,7 +12,6 @@ export const useSectionsStore = create((set) => ({
       set({ isLoading: true });
       const response = await axiosInstance.get("/sections");
       set({ sections: response.data.sections });
-      console.log("Sections fetched:", response.data.sections);
     } catch (error) {
       toast.error("Failed to fetch sections");
       console.error("Error fetching sections:", error);
@@ -29,7 +28,6 @@ export const useSectionsStore = create((set) => ({
         sections: response.data.sections,
       }));
       toast.success("Section added successfully");
-      console.log("Section added:", section);
     } catch (error) {
       toast.error(error.response?.data?.error || "Failed to add section");
       console.error("Error adding section:", error);
@@ -44,7 +42,6 @@ export const useSectionsStore = create((set) => ({
         sections: response.data.sections,
       }));
       toast.success("Section deleted successfully");
-      console.log("Section deleted:", section);
     } catch (error) {
       toast.error(error.response?.data?.error || "Failed to delete section");
       console.error("Error deleting section:", error);

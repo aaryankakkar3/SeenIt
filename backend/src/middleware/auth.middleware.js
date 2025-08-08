@@ -4,8 +4,8 @@ import User from "../models/user.model.js";
 export const protectRoute = async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
-    console.log("Auth middleware - JWT token:", token ? "Present" : "Missing");
-    console.log("Auth middleware - All cookies:", req.cookies);
+
+
 
     if (!token) {
       return res
@@ -25,7 +25,7 @@ export const protectRoute = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized, user not found" });
     }
 
-    console.log("Auth middleware - User authenticated:", user.email);
+
     req.user = user;
 
     next();

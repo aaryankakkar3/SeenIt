@@ -22,7 +22,6 @@ export const useAuthStore = create((set) => ({
         authUser: res.data,
       });
     } catch (error) {
-      console.log("Error checking auth:", error);
       set({
         authUser: null,
       });
@@ -53,7 +52,6 @@ export const useAuthStore = create((set) => ({
   },
   login: async (data) => {
     try {
-      console.log("useAuthStore reached with data :");
       set({ isLoggingIn: true });
       const res = await axiosInstance.post("/auth/login", data);
 

@@ -15,9 +15,7 @@ export const useExternalStore = create((set) => ({
     set({ isSearching: true });
 
     try {
-      console.log("Fetching query results for:", query, "Type:", type);
       const request = `/external/${type}/${encodeURIComponent(query)}`;
-      console.log("Request URL:", request);
       const response = await axiosInstance.get(request);
       const data = response.data;
 
@@ -25,7 +23,6 @@ export const useExternalStore = create((set) => ({
       const filteredResults = data.data || [];
 
       set({ queryResults: filteredResults, isSearching: false });
-      console.log("Query results:", filteredResults);
     } catch (error) {
       toast.error("Failed to fetch entries.");
       console.error("Error in fetching from backend.:", error);

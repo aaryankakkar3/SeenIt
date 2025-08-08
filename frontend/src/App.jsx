@@ -43,8 +43,6 @@ function App() {
       darkModeMediaQuery.removeEventListener("change", handleThemeChange);
   }, []);
 
-  console.log("Auth User:", authUser);
-
   if (isCheckingAuth && !authUser) {
     return (
       <div className="flex items-center justify-center h-screen">

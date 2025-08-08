@@ -33,7 +33,9 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: process.env.CORS_ORIGINS
+      ? process.env.CORS_ORIGINS.split(",")
+      : ["http://localhost:5173"],
     credentials: true,
   })
 );
@@ -51,6 +53,6 @@ app.use("/api/external", externalQueryRoutes);
 app.use("/api/openai", openaiapiRoutes);
 
 app.listen(PORT, () => {
-  console.log("Server is running on port " + PORT);
+  console.log(`Server is running on port ${PORT}`);
   connectDB();
 });

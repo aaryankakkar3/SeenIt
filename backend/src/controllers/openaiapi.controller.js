@@ -23,7 +23,7 @@ export const getAISuggestions = async (req, res) => {
     // Handle logged data - can be false or an object containing cached data
     if (loggedData && typeof loggedData === "object") {
       // loggedData is an object containing pre-fetched user data
-      console.log("Using pre-fetched logged data");
+
 
       // Format the cached logged data for the AI
       const formatMediaList = (
@@ -107,8 +107,8 @@ Rules:
     });
 
     const suggestionsText = response.choices[0].message.content.trim();
-    console.log("Raw AI response:", suggestionsText);
-    console.log("AI response length:", suggestionsText.length);
+
+
 
     try {
       // Clean the response (remove potential markdown formatting)
@@ -125,7 +125,7 @@ Rules:
           .replace(/\s*```$/, "");
       }
 
-      console.log("Cleaned response:", cleanedResponse);
+
 
       // Parse the JSON response
       const suggestions = JSON.parse(cleanedResponse);

@@ -98,7 +98,7 @@ export const createMediaController = (
 
   const createEntry = async (req, res) => {
     try {
-      console.log("Req body", req.body);
+
       console.log(`[${mediaConfig.name}Controller] Create entry request:`, {
         body: req.body,
         userId: req.user._id,
