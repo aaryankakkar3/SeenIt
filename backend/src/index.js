@@ -43,14 +43,6 @@ app.use(
   })
 );
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-  });
-}
-
 app.use("/api/anime", animeRoutes);
 app.use("/api/manga", mangaRoutes);
 app.use("/api/shows", showRoutes);
@@ -62,6 +54,14 @@ app.use("/api/auth", authRoutes);
 app.use("/api/sections", sectionsRoutes);
 app.use("/api/external", externalQueryRoutes);
 app.use("/api/openai", openaiapiRoutes);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
