@@ -19,7 +19,14 @@ const createTransporter = () => {
 export const sendVerificationEmail = async (to, token) => {
   try {
     const transporter = createTransporter();
-    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+
+    // Use production frontend URL or fallback to environment variable
+    const frontendUrl =
+      process.env.NODE_ENV === "production"
+        ? process.env.FRONTEND_URL || "https://seenit-4hc5.onrender.com"
+        : process.env.FRONTEND_URL || "http://localhost:5173";
+
+    const verificationUrl = `${frontendUrl}/verify-email?token=${token}`;
 
     const mailOptions = {
       from: {
@@ -148,7 +155,6 @@ export const sendVerificationEmail = async (to, token) => {
 
     const info = await transporter.sendMail(mailOptions);
 
-
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("Error sending verification email:", error);
@@ -159,7 +165,14 @@ export const sendVerificationEmail = async (to, token) => {
 export const sendPasswordResetEmail = async (to, token) => {
   try {
     const transporter = createTransporter();
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+    // Use production frontend URL or fallback to environment variable
+    const frontendUrl =
+      process.env.NODE_ENV === "production"
+        ? process.env.FRONTEND_URL || "https://seenit-4hc5.onrender.com"
+        : process.env.FRONTEND_URL || "http://localhost:5173";
+
+    const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
 
     const mailOptions = {
       from: {
@@ -310,7 +323,6 @@ export const sendPasswordResetEmail = async (to, token) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-
 
     return { success: true, messageId: info.messageId };
   } catch (error) {
