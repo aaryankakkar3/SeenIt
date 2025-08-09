@@ -75,7 +75,8 @@ function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
             onClick={handleAddMedia}
             className="text-p2 text-primary border-2 border-primary px-[12px] py-[6px] justify-center items-center flex cursor-pointer hover:bg-primary hover:text-dark transition-colors"
           >
-            {mediaConfig.addButtonText}
+            <span className="sm:hidden">+</span>
+            <span className="max-sm:hidden">{mediaConfig.addButtonText}</span>
           </button>
         </div>
         <button
