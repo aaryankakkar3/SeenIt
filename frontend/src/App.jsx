@@ -6,42 +6,17 @@ import AI from "./pages/AI";
 import SignUp from "./pages/SignUp";
 import VerifyEmail from "./pages/VerifyEmail";
 import { useAuthStore } from "./store/auth.store";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import ForgotPassword from "./pages/ForgotPassword";
 import HelpSigningIn from "./pages/HelpSigningIn";
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-
-  useEffect(() => {
-    // Check initial theme
-    const checkTheme = () => {
-      const darkModeMediaQuery = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      );
-      setIsDarkMode(darkModeMediaQuery.matches);
-    };
-
-    // Check on mount
-    checkTheme();
-
-    // Listen for theme changes
-    const darkModeMediaQuery = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    );
-    const handleThemeChange = (e) => setIsDarkMode(e.matches);
-
-    darkModeMediaQuery.addEventListener("change", handleThemeChange);
-
-    return () =>
-      darkModeMediaQuery.removeEventListener("change", handleThemeChange);
-  }, []);
 
   if (isCheckingAuth && !authUser) {
     return (
@@ -62,15 +37,15 @@ function App() {
           },
           success: {
             style: {
-              background: isDarkMode ? "#c6ff01" : "#526020",
-              color: isDarkMode ? "#000000" : "#ffffff",
+              background: "#c6ff01",
+              color: "#000000",
             },
             icon: false,
           },
           error: {
             style: {
-              background: isDarkMode ? "#ff3b30" : "#a23c3c",
-              color: isDarkMode ? "#ffffff" : "#ffffff",
+              background: "#ff3b30",
+              color: "#ffffff",
             },
             icon: false,
           },
