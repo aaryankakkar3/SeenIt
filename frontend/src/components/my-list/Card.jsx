@@ -80,11 +80,14 @@ export default function Card({
   }
 
   return (
-    <div className="w-[370px] flex flex-row gap-[16px] h-[129px]">
-      <img src={imageUrl} className="w-[90px] h-[129px]" />
-      <div className="w-[264px] h-[128px] flex flex-col gap-[8px]">
+    <div className="w-fit flex flex-row gap-[16px] h-fit max-md:flex-col max-md:w-[133px] max-md:gap-[6px] overflow-hidden">
+      <img
+        src={imageUrl}
+        className="w-[90px] h-[128px] max-md:h-[190px] max-md:w-[133px]"
+      />
+      <div className="w-[264px] h-fit flex flex-col gap-[8px]">
         <div className="flex flex-col gap-[4px]">
-          <div className="text-p1 text-text font-semibold truncate">
+          <div className="text-p1 text-text font-semibold truncate w-[264px] max-md:w-[133px]">
             {title}
           </div>
           <div className="text-textmuted text-p2 flex flex-row gap-[12px]">
@@ -110,7 +113,7 @@ export default function Card({
                 {mediaConfig.name === "Games"
                   ? `${watchedCount}%`
                   : mediaConfig.name === "Movies"
-                  ? "Watched"
+                  ? "Movie"
                   : `${watchedCount}/${totalCount}`}
               </div>
             ) : (
@@ -136,7 +139,7 @@ export default function Card({
               </>
             )}
           </div>
-          <div className="flex flex-rwo justify-between">
+          <div className="flex flex-row max-md:flex-col max-md:justify-start max-md:items-start max-md:gap-[4px] justify-between">
             <button
               onClick={() => onEdit(entry)}
               className="text-textmuted cursor-pointer hover:underline"

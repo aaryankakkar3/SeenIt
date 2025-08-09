@@ -73,25 +73,20 @@ function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
           <div className="text-h2 text-text capitalize">{mediaConfig.name}</div>
           <button
             onClick={handleAddMedia}
-            className="text-p2 text-primary border-2 border-primary w-[105px] h-[32px] justify-center items-center flex cursor-pointer hover:bg-primary hover:text-dark transition-colors"
+            className="text-p2 text-primary border-2 border-primary px-[12px] py-[6px] justify-center items-center flex cursor-pointer hover:bg-primary hover:text-dark transition-colors"
           >
             {mediaConfig.addButtonText}
           </button>
         </div>
         <button
           onClick={handleRemoveSection}
-          className="text-p2 text-textmuted border-2 border-textmuted w-[149px] h-[32px] justify-center items-center flex cursor-pointer hover:bg-textmuted hover:text-dark transition-colors"
+          className="text-p2 text-textmuted border-2 border-textmuted px-[12px] py-[6px] justify-center items-center flex cursor-pointer hover:bg-textmuted hover:text-dark transition-colors"
         >
           Remove Section
         </button>
       </div>
 
-      <div
-        className="grid gap-[12px]"
-        style={{
-          gridTemplateColumns: "repeat(auto-fill, minmax(370px, 1fr))",
-        }}
-      >
+      <div className="grid gap-[12px] max-md:gap-[24px] grid-cols-[repeat(auto-fill,minmax(370px,1fr))] max-md:grid-cols-[repeat(auto-fill,minmax(133px,1fr))]">
         {entries.map((entry, idx) => (
           <Card
             key={idx}

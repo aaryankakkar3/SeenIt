@@ -74,7 +74,7 @@ function MyList() {
   };
 
   return (
-    <div className="px-[64px] py-[32px] flex flex-col gap-[40px] min-h-screen">
+    <div className="px-[64px] max-md:px-[32px] py-[32px] flex flex-col gap-[40px] min-h-screen">
       <Navbar />
 
       {!hasSections ? (
@@ -102,7 +102,7 @@ function MyList() {
             <div className="w-full flex h-fit justify-center items-center">
               <button
                 onClick={handleOpenAddSectionModal}
-                className="bg-primary text-dark h-[32px] w-[122px] text-p2 font-semibold cursor-pointer hover:opacity-90"
+                className="bg-primary text-dark px-[12px] py-[6px] text-p2 font-semibold cursor-pointer hover:opacity-90"
               >
                 Add Section
               </button>
