@@ -132,8 +132,8 @@ function SignUp() {
   };
 
   return (
-    <div className="flex flex-row gap-[64px] h-[100vh] p-[64px] justify-center">
-      <div className="w-[50%] relative h-full rounded-[36px] overflow-hidden">
+    <div className="flex flex-row gap-[64px] h-[100vh] p-[64px] justify-center max-md:p-[32px]">
+      <div className="w-[50%] relative h-full rounded-[36px] overflow-hidden max-md:hidden">
         <Dither
           waveColor={[0.784, 1, 0]}
           disableAnimation={false}
@@ -149,8 +149,10 @@ function SignUp() {
           SeenIt
         </div>
       </div>
-      <div className="w-[50%] flex flex-col items-center justify-center gap-[32px] text-p1 p-[64px]">
-        <div className="text-h1">Sign Up</div>
+      <div className="w-[50%] flex flex-col items-center justify-center gap-[32px] text-p1 p-[64px] max-md:p-0 max-md:w-[75%]">
+        <div className="text-h1">
+          <span className="text-primary">SeenIt </span>Sign Up
+        </div>
         <form
           onSubmit={handleSubmit}
           className="flex flex-col w-[100%] gap-[16px]"
@@ -245,7 +247,7 @@ function SignUp() {
             </div>
           </div>
         </div>
-        <div className="text-textmuted">
+        <div className="text-textmuted leading-[1.5rem]">
           Already have an account?{" "}
           <button
             className="text-primary hover:underline cursor-pointer"
