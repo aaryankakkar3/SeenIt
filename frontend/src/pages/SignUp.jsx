@@ -151,7 +151,7 @@ function SignUp() {
       </div>
       <div className="w-[50%] flex flex-col items-center justify-center gap-[32px] text-p1 p-[64px] max-md:p-0 max-md:w-[75%]">
         <div className="text-h1">
-          <span className="text-primary">SeenIt </span>Sign Up
+          <span className="text-primary  md:hidden">SeenIt </span>Sign Up
         </div>
         <form
           onSubmit={handleSubmit}
