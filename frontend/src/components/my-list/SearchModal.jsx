@@ -99,7 +99,7 @@ export default function SearchModal({
       />
 
       {/* SearchModal Content */}
-      <div className="relative z-20 w-[528px] h-[582px] bg-medium flex flex-col p-[64px] gap-[12px]">
+      <div className="relative z-20 w-[528px] h-[582px] max-sm:w-full max-sm:h-full max-sm:p-[32px] bg-medium flex flex-col p-[64px] gap-[12px]">
         <div className="flex flex-row items-center justify-between">
           <div className="text-h2 text-text">Add New {mediaConfig.name}</div>
           <X
@@ -108,7 +108,7 @@ export default function SearchModal({
           />
         </div>
         <div className="flex flex-row gap-[8px] ">
-          <div className="w-[314px] h-[32px] bg-light px-[12px]">
+          <div className="w-full h-[32px] bg-light px-[12px]">
             <input
               autoComplete="off"
               type="text"
@@ -125,7 +125,7 @@ export default function SearchModal({
           <button
             onClick={() => getQueryResults(searchQuery, apiType)}
             disabled={isSearching}
-            className="h-[32px] w-[78px] text-dark bg-primary hover:opacity-90 flex justify-center items-center font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-[12px] py-[6px] text-dark bg-primary hover:opacity-90 flex justify-center items-center font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSearching ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -134,7 +134,7 @@ export default function SearchModal({
             )}
           </button>
         </div>
-        <div className="h-[360px] w-[400px] bg-light flex flex-col overflow-y-auto">
+        <div className="h-[360px] w-[400px] max-sm:h-full max-sm:w-full p-[12px] bg-light flex flex-col overflow-y-auto gap-[4px]">
           {isSearching ? (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="w-8 h-8 animate-spin text-textmuted" />

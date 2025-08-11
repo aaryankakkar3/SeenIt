@@ -26,7 +26,7 @@ export default function AddSectionModal({ isOpen, onClose }) {
       />
 
       {/* Modal Content */}
-      <div className="relative z-20 w-[400px] bg-medium flex flex-col p-[32px] gap-[16px]">
+      <div className="relative z-20 w-[400px] max-sm:w-[100%] bg-medium flex flex-col p-[32px] gap-[16px]">
         <div className="flex flex-row items-center justify-between">
           <div className="text-h2 text-text">Add Section</div>
           <X

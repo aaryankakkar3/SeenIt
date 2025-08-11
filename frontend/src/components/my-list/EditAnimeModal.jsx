@@ -537,9 +537,12 @@ export default function EditAnimeModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center ">
       {/* Backdrop */}
-      <div className="fixed inset-0 transition-opacity" onClick={onCloseAll} />
+      <div
+        className="fixed inset-0 bg-dark opacity-75 transition-opacity"
+        onClick={onCloseAll}
+      />
 
       {/* EditAnimeModal Content */}
       <div className="relative z-60 bg-medium flex flex-col p-[64px] gap-[32px]">
