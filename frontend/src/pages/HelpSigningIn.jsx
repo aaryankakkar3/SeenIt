@@ -116,8 +116,8 @@ function HelpSigningIn() {
           SeenIt
         </div>
       </div>
-      <div className="w-[50%] flex flex-col items-center justify-center gap-[24px] text-p1 p-[64px] max-md:p-0 max-md:w-[75%]">
-        <div className="text-h1">Help Signing In</div>
+      <div className="w-[50%] flex flex-col items-center justify-center gap-[24px] text-p1 p-[64px] max-md:p-0 max-md:w-[75%] max-sm:w-[100%]">
+        <div className="text-h1 leading-[1em]">Help Signing In</div>
         <form className="flex flex-col w-[100%] gap-[16px]" autoComplete="on">
           <div className="w-[100%] h-[52px] bg-medium px-[30px]">
             <input

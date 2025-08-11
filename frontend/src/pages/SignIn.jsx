@@ -150,9 +150,12 @@ function SignIn() {
           SeenIt
         </div>
       </div>
-      <div className="w-[50%] flex flex-col items-center justify-center gap-[32px] text-p1 p-[64px] max-md:p-0 max-md:w-[75%]">
-        <div className="text-h1">
-          <span className="text-primary md:hidden">SeenIt</span> Sign In
+      <div className="w-[50%] flex flex-col items-center justify-center gap-[32px] text-p1 p-[64px] max-md:p-0 max-md:w-[75%] max-sm:w-[100%]">
+        <div className="flex flex-row gap-[20px] max-sm:flex-col justify-center max-sm:gap-[32px]">
+          <div className="text-primary text-h1 text-center md:hidden">
+            SeenIt
+          </div>
+          <div className="text-h1 ">Sign In</div>
         </div>
         <form
           onSubmit={handleSubmit}

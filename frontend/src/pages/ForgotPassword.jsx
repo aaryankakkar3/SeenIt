@@ -126,8 +126,8 @@ function ForgotPassword() {
           SeenIt
         </div>
       </div>
-      <div className="w-[50%] flex flex-col items-center justify-center gap-[24px] text-p1 p-[64px] max-md:p-0 max-md:w-[75%]">
-        <div className="text-h1">Reset Password</div>
+      <div className="w-[50%] flex flex-col items-center justify-center gap-[24px] text-p1 p-[64px] max-md:p-0 max-md:w-[75%] max-sm:w-[100%]">
+        <div className="text-h1 leading-[1em]">Reset Password</div>
         <form
           onSubmit={handleSubmit}
           className="flex flex-col w-[100%] gap-[16px]"
