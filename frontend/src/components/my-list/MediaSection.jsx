@@ -81,7 +81,7 @@ function MediaSection({ onEdit, onOpenSearchModal, thisSection }) {
         </div>
         <button
           onClick={handleRemoveSection}
-          className="text-p2 text-textmuted border-2 border-textmuted px-[12px] py-[6px] justify-center items-center flex cursor-pointer hover:bg-textmuted hover:text-dark transition-colors"
+          className="text-p2 text-textmuted border-2 border-textmuted px-[12px] max-sm:px-[6px] py-[6px] justify-center items-center flex cursor-pointer hover:bg-textmuted hover:text-dark transition-colors"
         >
           Remove Section
         </button>

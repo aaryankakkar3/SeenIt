@@ -253,11 +253,11 @@ function AI() {
   };
 
   return (
-    <div className="px-[64px] py-[32px] flex flex-col gap-[40px] ">
+    <div className="px-[64px] max-md:px-[32px] py-[32px] flex flex-col gap-[40px] ">
       <Navbar />
       <div className="flex flex-col gap-[32px] ">
         <div className="flex flex-col gap-[16px]">
-          <div className="flex flex-row justify-between items-center">
+          <div className="flex flex-row max-sm:flex-col max-sm:gap-[8px] max-sm:items-start justify-between items-center">
             <div className="text-h2">Give Us Context</div>
             <div className="text-textmuted text-p2">{context.length}/300</div>
           </div>
@@ -275,9 +275,11 @@ function AI() {
         </div>
         <div className="flex flex-col gap-[16px]">
           <div className="text-h2">Filters</div>
-          <div className="flex flex-row gap-[16px] w-full">
-            <div className="w-[33%] border border-textmuted flex flex-col gap-[8px] p-[16px]">
-              <div className="text-text text-p1 ">Media Type</div>
+          <div className="flex flex-row max-sm:flex-col gap-[16px] w-full">
+            <div className="w-[33%] max-md:w-fit border max-sm:w-full border-textmuted flex flex-col gap-[8px] p-[16px]">
+              <div className="text-text text-p1 px-[8px] py-[4px]">
+                Media Type
+              </div>
               <div className="flex flex-col text-text text-p2 gap-[4px]">
                 {mediaTypes.map((mediaType) => (
                   <div
@@ -292,13 +294,13 @@ function AI() {
                 ))}
               </div>
             </div>
-            <div className="w-[67%] border border-textmuted flex flex-col gap-[8px] p-[16px]">
-              <div className="text-text text-p1 ">Genres</div>
-              <div className="grid grid-cols-4 text-text text-p2 gap-[4px]">
+            <div className="w-full border border-textmuted flex flex-col gap-[8px] p-[16px]">
+              <div className="text-text text-p1 px-[8px] py-[4px] ">Genres</div>
+              <div className="grid grid-cols-4 max-md:grid-cols-3 max-sm:grid-cols-2 text-text text-p2 gap-[4px]">
                 {genres.map((genre) => (
                   <div
                     key={genre}
-                    className={`px-[8px] py-[4px] rounded transition-colors ${getGenreStyle(
+                    className={`px-[8px] py-[4px] rounded transition-colors truncate ${getGenreStyle(
                       genre
                     )}`}
                     onClick={() => handleGenreClick(genre)}
@@ -310,8 +312,8 @@ function AI() {
             </div>
           </div>
         </div>
-        <div className="flex flex-row gap-[8px] items-center">
-          <div className="text-text text-p1">
+        <div className="flex flex-row gap-[8px] justify-start items-center">
+          <div className="text-text text-p1 leading-[1.5rem]">
             Do you want to use your logged data to improve suggestions?
           </div>
           {isLoadingLoggedData && (
@@ -320,7 +322,7 @@ function AI() {
             </div>
           )}
           <button
-            className={`h-[20px] w-[20px] border cursor-pointer transition-colors ${
+            className={`h-[20px] w-[20px] border cursor-pointer transition-colors flex-shrink-0 ${
               useLoggedData
                 ? "bg-primary border-primary"
                 : "border-textmuted hover:border-text"
