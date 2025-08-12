@@ -14,8 +14,8 @@ import { toast } from "react-hot-toast";
 // Move component functions outside to prevent recreation on every render
 function YearBox({ year }) {
   return (
-    <div className="flex flex-col gap-[6px] w-full">
-      <div className="font-semibold">Year</div>
+    <div className="flex flex-col gap-[6px] w-full min-w-0">
+      <div className="font-semibold truncate w-full">Year</div>
       <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
         {year || "Unknown"}
       </div>
@@ -25,10 +25,10 @@ function YearBox({ year }) {
 
 function StatusBox({ mediaStatus }) {
   return (
-    <div className="flex flex-col gap-[6px] w-full">
-      <div className="font-semibold">Status</div>
+    <div className="flex flex-col gap-[6px] w-full min-w-0">
+      <div className="font-semibold truncate w-full">Status</div>
       <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
-        {mediaStatus}
+        <div className="truncate w-full">{mediaStatus}</div>
       </div>
     </div>
   );
@@ -36,9 +36,11 @@ function StatusBox({ mediaStatus }) {
 
 function ReleasedBox({ mediaConfig, totalCount }) {
   return (
-    <div className="flex flex-col gap-[6px] w-full">
-      <div className="font-semibold">Released {mediaConfig.releasedLabel}</div>
-      <div className="bg-light w-full h-[40px] px-[12px] flex items-center">
+    <div className="flex flex-col gap-[6px] w-full min-w-0">
+      <div className="font-semibold truncate w-full">
+        Released {mediaConfig.releasedLabel}
+      </div>
+      <div className="bg-light w-full h-[40px] px-[12px] flex items-center min-w-0">
         {totalCount || "Unknown"}
       </div>
     </div>
@@ -53,9 +55,11 @@ function ConsumedBox({
   totalCount,
 }) {
   return (
-    <div className="flex flex-col gap-[6px] w-full text-text">
-      <div className="font-semibold">{mediaConfig.consumedLabel}</div>
-      <div className="w-full h-[40px] bg-light px-[12px]">
+    <div className="flex flex-col gap-[6px] w-full min-w-0 text-text">
+      <div className="font-semibold truncate w-full">
+        {mediaConfig.consumedLabel}
+      </div>
+      <div className="w-full h-[40px] bg-light px-[12px] min-w-0">
         <input
           autoComplete="off"
           type="number"
@@ -75,9 +79,9 @@ function ConsumedBox({
 
 function RatingBox({ rating, handleRatingChange, handleSubmit }) {
   return (
-    <div className="flex flex-col gap-[6px] w-full text-text">
-      <div className="font-semibold">Rating</div>
-      <div className="w-full h-[40px] bg-light px-[12px]">
+    <div className="flex flex-col gap-[6px] w-full min-w-0 text-text">
+      <div className="font-semibold truncate w-full">Rating</div>
+      <div className="w-full h-[40px] bg-light px-[12px] min-w-0">
         <input
           autoComplete="off"
           type="number"
@@ -98,8 +102,8 @@ function RatingBox({ rating, handleRatingChange, handleSubmit }) {
 
 function ProgressBox({ progress, handleProgressChange, handleSubmit }) {
   return (
-    <div className="flex flex-col gap-[6px] w-full text-text">
-      <div className="font-semibold">Progress %</div>
+    <div className="flex flex-col gap-[6px] w-full min-w-0 text-text">
+      <div className="font-semibold truncate w-full">Progress %</div>
       <div className="w-full h-[40px] bg-light px-[12px]">
         <input
           autoComplete="off"
@@ -134,14 +138,14 @@ function DivOne({
     currentSection === "comics"
   ) {
     return (
-      <div className="flex flex-row gap-[12px] w-full">
+      <div className="flex flex-row gap-[12px] w-full min-w-0">
         <YearBox year={year} />
         <StatusBox mediaStatus={mediaStatus} />
       </div>
     );
   } else if (currentSection === "games") {
     return (
-      <div className="flex flex-row gap-[12px] w-full">
+      <div className="flex flex-row gap-[12px] w-full min-w-0">
         <YearBox year={year} />
         <RatingBox
           rating={rating}
@@ -157,7 +161,7 @@ function DivOne({
     );
   } else {
     return (
-      <div className="flex flex-row gap-[12px] w-full">
+      <div className="flex flex-row gap-[12px] w-full min-w-0">
         <YearBox year={year} />
         <RatingBox
           rating={rating}
@@ -186,7 +190,7 @@ function DivTwo({
     currentSection === "comics"
   ) {
     return (
-      <div className="flex flex-row gap-[12px] w-full">
+      <div className="flex flex-row gap-[12px] w-full min-w-0">
         <ReleasedBox mediaConfig={mediaConfig} totalCount={totalCount} />
         <ConsumedBox
           mediaConfig={mediaConfig}
@@ -204,7 +208,7 @@ function DivTwo({
     );
   } else if (currentSection === "books") {
     return (
-      <div className="flex flex-row gap-[12px] w-full">
+      <div className="flex flex-row gap-[12px] w-full min-w-0">
         <ReleasedBox mediaConfig={mediaConfig} totalCount={totalCount} />
         <ConsumedBox
           mediaConfig={mediaConfig}
@@ -533,8 +537,20 @@ export default function EditAnimeModal({
 
   let imageHeight = "h-[381px]";
   if (currentSection === "movies" || currentSection === "games") {
-    imageHeight = "h-[300px]";
+    if (window.innerWidth <= 1024) {
+      imageHeight = "h-[355px]";
+    } else {
+      imageHeight = "h-[300px]";
+    }
+  } else {
+    if (window.innerWidth <= 1024) {
+      imageHeight = "h-[433px]";
+    } else {
+      imageHeight = "h-[381px]";
+    }
   }
+
+  // h-[433px]
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center ">
@@ -545,7 +561,7 @@ export default function EditAnimeModal({
       />
 
       {/* EditAnimeModal Content */}
-      <div className="relative z-60 bg-medium flex flex-col p-[64px] gap-[32px]">
+      <div className="relative z-60 bg-medium flex flex-col p-[64px] gap-[32px] max-md:h-full max-md:w-full max-md:p-[32px] max-sm:overflow-y-auto border justify-center">
         <div className="flex flex-row justify-between">
           <div className="text-h2 text-text">
             {isEditing
@@ -557,12 +573,12 @@ export default function EditAnimeModal({
             onClick={onCloseAll}
           />
         </div>
-        <div className="flex flex-row gap-[32px]">
+        <div className="flex flex-row gap-[32px] max-md:gap-[16px] w-full max-sm:flex-col">
           <img
             src={imageUrl}
-            className={`object-cover aspect-[267/381] ${imageHeight}`}
+            className={`object-cover aspect-[267/381] ${imageHeight} max-sm:w-full max-sm:h-auto max-sm:object-contain max-sm:aspect-auto`}
           />
-          <div className="flex flex-col gap-[32px] h-fit">
+          <div className="flex flex-col gap-[32px] h-fit w-full max-sm:flex-shrink-0">
             <div className="flex flex-col gap-[16px] text-textmuted text-p2">
               <div className="flex flex-col gap-[6px]">
                 <div className="font-semibold">Name</div>
@@ -585,7 +601,7 @@ export default function EditAnimeModal({
               <div className="flex flex-row gap-[12px] w-full">
                 <div className="flex flex-col gap-[6px] w-full text-text">
                   <div className="font-semibold">Your Status</div>
-                  <div className="flex flex-row gap-[12px]">
+                  <div className="flex flex-row max-md:grid max-md:grid-cols-2 gap-[12px]">
                     {statusOptions.map((status) => (
                       <button
                         key={status}

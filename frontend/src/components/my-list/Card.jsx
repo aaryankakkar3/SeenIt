@@ -83,7 +83,7 @@ export default function Card({
     <div className="w-fit flex flex-row gap-[16px] h-fit max-md:flex-col max-md:w-[133px] max-md:gap-[6px] overflow-hidden">
       <img
         src={imageUrl}
-        className="w-[90px] h-[128px] max-md:h-[190px] max-md:w-[133px]"
+        className="w-[90px] h-[128px] max-md:h-[190px] max-md:w-[133px] object-cover"
       />
       <div className="w-[264px] h-fit flex flex-col gap-[8px]">
         <div className="flex flex-col gap-[4px]">
