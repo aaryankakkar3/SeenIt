@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
-import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import Dither from "../components/react-components/Dither";
 import { useAuthStore } from "../store/auth.store";
 import { toast } from "react-hot-toast";
@@ -15,7 +15,7 @@ function SignUp() {
   });
   const { signup, isSigningUp, googleAuth, isGoogleLoading } = useAuthStore();
 
-  // Add custom CSS to override autofill styles
+  // Add custom CSS to override autofill styles and style Google button
   useEffect(() => {
     const style = document.createElement("style");
     style.textContent = `
@@ -54,6 +54,36 @@ function SignUp() {
         background-color: var(--color-light) !important;
         color: var(--color-text) !important;
       }
+
+      /* Google Login Button Styling */
+      .google-login-container iframe {
+        height: 52px !important;
+        width: 100% !important;
+      }
+      
+      .google-login-container [data-testid="gsi_button"] {
+        width: 100% !important;
+        height: 52px !important;
+      }
+      
+      .google-login-container div[role="button"] {
+        width: 100% !important;
+        height: 52px !important;
+        background-color: var(--color-medium) !important;
+        border: none !important;
+        border-radius: 0 !important;
+        font-family: inherit !important;
+      }
+      
+      .google-login-container div[role="button"]:hover {
+        background-color: var(--color-light) !important;
+      }
+      
+      .google-login-container div[role="button"] span {
+        color: var(--color-text) !important;
+        font-size: 1rem !important;
+        font-weight: normal !important;
+      }
     `;
     document.head.appendChild(style);
 
@@ -69,6 +99,14 @@ function SignUp() {
   const handleGoogleError = () => {
     toast.error("Google sign up failed");
   };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      // Convert the token response to the format expected by googleAuth
+      googleAuth(tokenResponse.access_token, true);
+    },
+    onError: handleGoogleError,
+  });
 
   const validateForm = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -219,41 +257,21 @@ function SignUp() {
             {isSigningUp ? "Signing Up..." : "Sign Up"}
           </button>
         </form>
-        <div className="flex flex-col w-[100%] gap-[16px]">
-          <div className="relative h-[52px] w-[100%] group">
-            <button
-              className={`h-[52px] w-[100%] bg-medium flex justify-center items-center text-text gap-[16px] cursor-pointer group-hover:bg-light transition-colors ${
-                isGoogleLoading ? "opacity-50" : ""
-              }`}
-              disabled={isGoogleLoading}
-            >
-              <FaGoogle className="w-36px h-36px" />
-              <div>
-                {isGoogleLoading
-                  ? "Signing up with Google..."
-                  : "Sign up with Google"}
-              </div>
-            </button>
-            {/* Invisible GoogleLogin component positioned over custom button */}
-            <div
-              className="absolute inset-0 z-10 flex items-center justify-center"
-              style={{
-                opacity: 0,
-                pointerEvents: isGoogleLoading ? "none" : "auto",
-              }}
-            >
-              <div style={{ width: "100%", height: "100%" }}>
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleError}
-                  width="100%"
-                  size="large"
-                  theme="filled_blue"
-                  style={{ width: "100%", height: "100%" }}
-                />
-              </div>
+        <div className="h-fit w-[100%]">
+          <button
+            onClick={() => googleLogin()}
+            className={`h-[52px] w-[100%] bg-medium flex justify-center items-center text-text gap-[16px] cursor-pointer hover:bg-light transition-colors ${
+              isGoogleLoading ? "opacity-50" : ""
+            }`}
+            disabled={isGoogleLoading}
+          >
+            <FaGoogle className="w-36px h-36px" />
+            <div>
+              {isGoogleLoading
+                ? "Signing up with Google..."
+                : "Sign up with Google"}
             </div>
-          </div>
+          </button>
         </div>
         <div className="text-textmuted leading-[1.5rem]">
           Already have an account?{" "}

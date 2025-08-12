@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 function AIResultsModal({ isOpen, onClose, suggestions, isLoading, error }) {
   function SuggestionCard({ title, mediaType, reason }) {
     return (
-      <div className="flex flex-col gap-[8px] p-[24px] bg-light w-[400px]">
+      <div className="flex flex-col gap-[8px] p-[24px] bg-light w-[360px] max-md:w-[260px] max-sm:w-full">
         <div className="text-text text-p2 flex flex-col gap-[4px]">
           <div className="">{title}</div>
           <div className="">[{mediaType}]</div>
@@ -26,7 +26,7 @@ function AIResultsModal({ isOpen, onClose, suggestions, isLoading, error }) {
         />
 
         {/* Modal Content */}
-        <div className="relative z-20 w-[90%] h-[90%] bg-medium flex flex-col p-[64px] gap-[32px]">
+        <div className="relative z-20 w-[90%] h-[90%] max-md:w-full max-md:h-full max-md:p-[32px] bg-medium flex flex-col p-[64px] gap-[32px]">
           <div className="flex flex-row items-center justify-between">
             <div className="text-h2 text-text">Suggestions</div>
             <X
@@ -54,12 +54,7 @@ function AIResultsModal({ isOpen, onClose, suggestions, isLoading, error }) {
 
             {/* Suggestions Grid */}
             {!isLoading && !error && suggestions && suggestions.length > 0 && (
-              <div
-                className="grid gap-[24px]"
-                style={{
-                  gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
-                }}
-              >
+              <div className="grid gap-[24px] grid-cols-[repeat(auto-fill,minmax(360px,1fr))] max-md:grid-cols-[repeat(auto-fill,minmax(260px,1fr))] max-sm:grid-cols-1">
                 {suggestions.map((suggestion, index) => (
                   <SuggestionCard
                     key={index}

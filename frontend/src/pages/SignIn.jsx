@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
-import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import Dither from "../components/react-components/Dither";
 import { useAuthStore } from "../store/auth.store";
 import { toast } from "react-hot-toast";
@@ -16,7 +16,7 @@ function SignIn() {
 
   const [shouldTriggerSave, setShouldTriggerSave] = useState(false);
 
-  // Add custom CSS to override autofill styles
+  // Add custom CSS to override autofill styles and style Google button
   useEffect(() => {
     const style = document.createElement("style");
     style.textContent = `
@@ -63,14 +63,22 @@ function SignIn() {
     };
   }, []);
 
-  const handleGoogleSuccess = (credentialResponse) => {
-    console.log("Google auth started, isGoogleLoading:", isGoogleLoading);
-    googleAuth(credentialResponse.credential, false);
-  };
-
   const handleGoogleError = () => {
     toast.error("Google sign in failed");
   };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        // Send the access token to your backend
+        googleAuth(tokenResponse.access_token, false);
+      } catch (error) {
+        console.error("Error with Google login:", error);
+        handleGoogleError();
+      }
+    },
+    onError: handleGoogleError,
+  });
 
   const validateForm = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -214,41 +222,21 @@ function SignIn() {
             {isLoggingIn ? "Logging in..." : "Login"}
           </button>
         </form>
-        <div className="flex flex-col w-[100%] gap-[16px]">
-          <div className="relative h-[52px] w-[100%] group">
-            <button
-              className={`h-[52px] w-[100%] bg-medium flex justify-center items-center text-text gap-[16px] cursor-pointer group-hover:bg-light transition-colors ${
-                isGoogleLoading ? "opacity-50" : ""
-              }`}
-              disabled={isGoogleLoading}
-            >
-              <FaGoogle className="w-36px h-36px" />
-              <div>
-                {isGoogleLoading
-                  ? "Signing in with Google..."
-                  : "Sign in with Google"}
-              </div>
-            </button>
-            {/* Invisible GoogleLogin component positioned over custom button */}
-            <div
-              className="absolute inset-0 z-10 flex items-center justify-center"
-              style={{
-                opacity: 0,
-                pointerEvents: isGoogleLoading ? "none" : "auto",
-              }}
-            >
-              <div style={{ width: "100%", height: "100%" }}>
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleError}
-                  width="100%"
-                  size="large"
-                  theme="filled_blue"
-                  style={{ width: "100%", height: "100%" }}
-                />
-              </div>
+        <div className="h-fit w-[100%]">
+          <button
+            className={`h-[52px] w-[100%] bg-medium flex justify-center items-center text-text gap-[16px] cursor-pointer hover:bg-light transition-colors ${
+              isGoogleLoading ? "opacity-50" : ""
+            }`}
+            disabled={isGoogleLoading}
+            onClick={() => googleLogin()}
+          >
+            <FaGoogle className="w-36px h-36px" />
+            <div>
+              {isGoogleLoading
+                ? "Signing in with Google..."
+                : "Sign in with Google"}
             </div>
-          </div>
+          </button>
         </div>
         <div className="text-textmuted leading-[1.5rem]">
           Don't have an account?{" "}

@@ -63,7 +63,6 @@ export const signup = async (req, res) => {
       // Send verification email
       try {
         await sendVerificationEmail(email, verificationToken);
-
       } catch (emailError) {
         console.error("Failed to send verification email:", emailError);
         // Don't fail the signup if email fails, but log it
@@ -82,7 +81,6 @@ export const signup = async (req, res) => {
       res.status(400).json({ message: "Invalid User Data" });
     }
   } catch (error) {
-
     // Handle mongoose validation errors
     if (error.name === "ValidationError") {
       const validationErrors = Object.values(error.errors).map(
@@ -139,7 +137,6 @@ export const login = async (req, res) => {
       verified: user.verified,
     });
   } catch (error) {
-
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -148,23 +145,19 @@ export const logout = (req, res) => {
     res.cookie("jwt", "", { maxAge: 0 });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
 export const verifyEmail = async (req, res) => {
   try {
-
     const { token } = req.query;
 
     if (!token) {
-
       return res
         .status(400)
         .json({ message: "Verification token is required" });
     }
-
 
     // Find user with the verification token
     const user = await User.findOne({
@@ -172,10 +165,7 @@ export const verifyEmail = async (req, res) => {
       verificationTokenExpiry: { $gt: new Date() }, // Check if token hasn't expired
     });
 
-
     if (!user) {
-
-
       // Check if this is a duplicate request after successful verification
       // We can't directly check by token since it's cleared, but we can be more helpful
       const recentlyVerifiedUser = await User.findOne({
@@ -184,7 +174,6 @@ export const verifyEmail = async (req, res) => {
       }).sort({ updatedAt: -1 });
 
       if (recentlyVerifiedUser) {
-
         // Return success for duplicate verification attempts
         return res.status(200).json({
           message:
@@ -193,13 +182,11 @@ export const verifyEmail = async (req, res) => {
         });
       }
 
-
       return res.status(400).json({
         message:
           "Invalid or expired verification token. Please request a new verification email.",
       });
     }
-
 
     // Update user to verified and clear verification fields
     user.verified = true;
@@ -207,14 +194,12 @@ export const verifyEmail = async (req, res) => {
     user.verificationTokenExpiry = undefined;
     await user.save();
 
-
     res.status(200).json({
       message:
         "Email verified successfully! You can now log in to your account.",
       verified: true,
     });
   } catch (error) {
-
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -258,7 +243,6 @@ export const resendVerificationEmail = async (req, res) => {
       });
     }
   } catch (error) {
-
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -267,7 +251,6 @@ export const checkAuth = (req, res) => {
   try {
     res.status(200).json(req.user);
   } catch (error) {
-
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -276,14 +259,33 @@ export const googleSignIn = async (req, res) => {
   try {
     const { credential } = req.body;
 
-    // Verify the Google token
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    let email, name, picture, googleId;
 
-    const payload = ticket.getPayload();
-    const { email, name, picture, sub: googleId } = payload;
+    // Check if credential is a JWT token (old format) or access token (new format)
+    // JWT tokens have 3 parts separated by dots (header.payload.signature)
+    // Access tokens are single strings without dots
+    if (credential && credential.split(".").length === 3) {
+      // JWT token format - verify with Google
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      ({ email, name, picture, sub: googleId } = payload);
+    } else {
+      // Access token format - fetch user info from Google
+      const response = await fetch(
+        `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${credential}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch user info from Google");
+      }
+      const userInfo = await response.json();
+      email = userInfo.email;
+      name = userInfo.name;
+      picture = userInfo.picture;
+      googleId = userInfo.id;
+    }
 
     // Check if user exists
     let user = await User.findOne({ email });
@@ -314,7 +316,7 @@ export const googleSignIn = async (req, res) => {
       },
     });
   } catch (error) {
-
+    console.error("Google sign-in error:", error);
     res.status(500).json({ message: "Google authentication failed" });
   }
 };
@@ -323,14 +325,33 @@ export const googleSignUp = async (req, res) => {
   try {
     const { credential } = req.body;
 
-    // Verify the Google token
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    let email, name, picture, googleId;
 
-    const payload = ticket.getPayload();
-    const { email, name, picture, sub: googleId } = payload;
+    // Check if credential is a JWT token (old format) or access token (new format)
+    // JWT tokens have 3 parts separated by dots (header.payload.signature)
+    // Access tokens are single strings without dots
+    if (credential && credential.split(".").length === 3) {
+      // JWT token format - verify with Google
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      ({ email, name, picture, sub: googleId } = payload);
+    } else {
+      // Access token format - fetch user info from Google
+      const response = await fetch(
+        `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${credential}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch user info from Google");
+      }
+      const userInfo = await response.json();
+      email = userInfo.email;
+      name = userInfo.name;
+      picture = userInfo.picture;
+      googleId = userInfo.id;
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -370,6 +391,7 @@ export const googleSignUp = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Google sign-up error:", error);
 
     if (error.code === 11000) {
       res.status(400).json({ message: "Email already exists" });
@@ -433,7 +455,6 @@ export const forgotPassword = async (req, res) => {
       });
     }
   } catch (error) {
-
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -483,7 +504,6 @@ export const resetPassword = async (req, res) => {
         "Password reset successfully! You can now log in with your new password.",
     });
   } catch (error) {
-
     res.status(500).json({ message: "Internal server error" });
   }
 };

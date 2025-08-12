@@ -553,7 +553,7 @@ export default function EditAnimeModal({
   // h-[433px]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center ">
+    <div className="overflow-y-auto fixed inset-0 z-50 flex items-center justify-center max-sm:items-start">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-dark opacity-75 transition-opacity"
@@ -561,7 +561,7 @@ export default function EditAnimeModal({
       />
 
       {/* EditAnimeModal Content */}
-      <div className="relative z-60 bg-medium flex flex-col p-[64px] gap-[32px] max-md:h-full max-md:w-full max-md:p-[32px] max-sm:overflow-y-auto border justify-center">
+      <div className="relative z-60 bg-medium flex flex-col p-[64px] gap-[32px] max-md:w-full max-md:p-[32px] max-sm:overflow-y-auto justify-center max-sm:justify-start">
         <div className="flex flex-row justify-between">
           <div className="text-h2 text-text">
             {isEditing
