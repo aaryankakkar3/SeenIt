@@ -236,10 +236,11 @@ function SignUp() {
             </button>
             {/* Invisible GoogleLogin component positioned over custom button */}
             <div
-              className={`absolute inset-0 ${
-                isGoogleLoading ? "pointer-events-none" : "pointer-events-auto"
-              }`}
-              style={{ opacity: 0 }}
+              className="absolute inset-0 z-10"
+              style={{
+                opacity: 0,
+                pointerEvents: isGoogleLoading ? "none" : "auto",
+              }}
             >
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
