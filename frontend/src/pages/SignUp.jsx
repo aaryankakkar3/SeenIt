@@ -236,18 +236,22 @@ function SignUp() {
             </button>
             {/* Invisible GoogleLogin component positioned over custom button */}
             <div
-              className="absolute inset-0 z-10"
+              className="absolute inset-0 z-10 flex items-center justify-center"
               style={{
                 opacity: 0,
                 pointerEvents: isGoogleLoading ? "none" : "auto",
               }}
             >
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-                width="100%"
-                size="large"
-              />
+              <div style={{ width: "100%", height: "100%" }}>
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  width="100%"
+                  size="large"
+                  theme="filled_blue"
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </div>
             </div>
           </div>
         </div>
